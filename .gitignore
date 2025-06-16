@@ -194,4 +194,4 @@ cython_debug/
 .cursorindexingignore
 
 # Folder for testing
-*/sandbox/*
+DSF/*/sandbox/*
