@@ -82,14 +82,16 @@ def main(yaml_config):
     for entry in file_entries:
         fn     = entry['FILENAME']
         caps   = entry['CAPILLARY_LIST']
-        color  = entry.get('COLOR', None)
-        label  = entry.get('LABEL', None)
+        color_list  = entry.get('COLOR', None)
+        label_list  = entry.get('LABEL', None)
 
         df_ov, df_r, df_fd = read_data(fn)
         data = filter_data(df_r, df_fd, caps)
-        for cap in caps:
+        for idx, cap in enumerate(caps):
             cap_str = str(cap)
             temps, ratio, deriv = data[cap_str]
+            color = color_list[idx] if color_list and idx < len(color_list) else None
+            label = label_list[idx] if label_list and idx < len(label_list) else None
             # derive label from Overview sheet
             mask = df_ov['Capillary'].astype(str) == cap_str
             if label:
