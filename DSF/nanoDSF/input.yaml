@@ -1,12 +1,12 @@
 FILES:
   - FILENAME: "FILENAME1.xlsx"
     CAPILLARY_LIST: ["1", "2"] # List of the capillaries to process
-    COLOR: ["tab:blue"] # Optional, can be removed
+    COLOR_LIST: ["tab:blue"] # Optional, can be removed
 
   - FILENAME: "240418_af1503_ep_13c_15n_denat.xlsx"
     CAPILLARY_LIST: ["1"] # List of the capillaries to process
-    COLOR: "tab:orange" # Optional, can be removed
-    LABEL: ["TEST$_1$"] # Optional name, default is the name in the Sample_ID
+    COLOR_LIST: ["tab:orange"] # Optional, can be removed
+    LABEL_LIST: ["TEST$_1$"] # Optional name, default is the name in the Sample_ID
 
 OUTPUT_NAME: "combined.png"
 # TEMP_MIN: START

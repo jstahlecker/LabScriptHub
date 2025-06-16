@@ -82,8 +82,8 @@ def main(yaml_config):
     for entry in file_entries:
         fn     = entry['FILENAME']
         caps   = entry['CAPILLARY_LIST']
-        color_list  = entry.get('COLOR', None)
-        label_list  = entry.get('LABEL', None)
+        color_list  = entry.get('COLOR_LIST', None)
+        label_list  = entry.get('LABEL_LIST', None)
 
         df_ov, df_r, df_fd = read_data(fn)
         data = filter_data(df_r, df_fd, caps)
