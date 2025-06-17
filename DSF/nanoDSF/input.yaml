@@ -1,13 +1,24 @@
 FILES:
   - FILENAME: "FILENAME1.xlsx"
-    CAPILLARY_LIST: ["1", "2"] # List of the capillaries to process
-    COLOR_LIST: ["tab:blue"] # Optional, can be removed
+    CAPILLARY_LIST:
+      - 1    # Capillary number
+      - 2  
+    COLOR_LIST:
+      - tab:blue    # Optional: plot color for each capillary
+      - red
+    LABEL_LIST:
+      - TEST1       # Optional: label for each capillary
+      - TEST$_2$    # Maybe try quotes if special characters fail
 
-  - FILENAME: "240418_af1503_ep_13c_15n_denat.xlsx"
-    CAPILLARY_LIST: ["1"] # List of the capillaries to process
-    COLOR_LIST: ["tab:orange"] # Optional, can be removed
-    LABEL_LIST: ["TEST$_1$"] # Optional name, default is the name in the Sample_ID
+  - FILENAME: "FILENAME2.xlsx"
+    CAPILLARY_LIST:
+      - 1
+    #COLOR_LIST:
+    #  - tab:orange
+    #LABEL_LIST:
 
-OUTPUT_NAME: "combined.png"
-# TEMP_MIN: START
-# TEMP_MAX: END
+
+# Output settings
+OUTPUT_NAME: "combined.png"  # Name of the resulting plot or figure
+#TEMP_MIN: START                 # Minimum temperature (°C)
+#TEMP_MAX: END                   # Maximum temperature (°C)
