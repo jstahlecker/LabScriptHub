@@ -1,0 +1,7 @@
+FILENAME: FILENAME.xlsx
+SKIPROWS: 10 # This needs to be set. 10 works for my setup
+
+#OUTPUT_FOLDER: /path/to/output/folder
+#OUTPUT_FILENAME: output.xlsx
+#SHEET_NAME: All Cycles
+#REFERENCE_STANDARD: Standard S12
