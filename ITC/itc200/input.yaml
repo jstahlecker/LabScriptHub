@@ -1,0 +1,8 @@
+FILENAME: FILENAME.csv
+
+
+#OUTPUT_FOLDER: /path/to/output/folder
+#OUTPUT_NAME: NAME
+#ENERGY_UNIT: kcal / mol
+#DELIMITER: "," # Use quotes
+#DECIMAL: "." # Use quotes
