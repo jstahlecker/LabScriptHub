@@ -32,7 +32,7 @@ The repository is structured as follows:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/LabScriptHub.git
+   git clone https://github.com/jstahlecker/LabScriptHub.git
    cd LabScriptHub
    ```
 
