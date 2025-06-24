@@ -35,7 +35,7 @@ def has_overlap(ax, index1, index2):
                 return True
     return False
 
-def plot_itc_new(df, output, energy_unit):
+def plot_itc(df, output, energy_unit):
 
     time = df["DP_X"]
     dh = df["DP_Y"]
@@ -71,7 +71,7 @@ def plot_itc_new(df, output, energy_unit):
     ndh_y = df["NDH_Y"].to_numpy()
     fit_y = df["Fit_Y"].to_numpy()
     ndh_x = df["NDH_X"].to_numpy() # Same as Molar_Ratio_Raw
-    fit_x = df["Fit_X"].to_numpy() # Same as Molar_Ratio_Fit
+    fit_x = df["Fit_X"].to_numpy()
 
     # Remove all Nan values
     ndh_y = ndh_y[~np.isnan(ndh_y)]
@@ -174,7 +174,7 @@ def main(yaml_config: Path):
     # Load df
     #df = pd.read_csv(input_file, sep=';', decimal=',')
     df = pd.read_csv(input_file, sep=delimiter, decimal=decimal)
-    plot_itc_new(df, output_name, energy_unit)
+    plot_itc(df, output_name, energy_unit)
 
 if __name__ == "__main__":
     import argparse

@@ -9,8 +9,6 @@ import sys
 from itc_final_figure import *
 
 
-
-
 # Create a simple GUI to select file and set options
 class ITCFinalFigureGUI:
     def __init__(self, master):
