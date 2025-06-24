@@ -70,7 +70,7 @@ def plot_itc_new(df, output, energy_unit):
     # Remove all Nan values of df["NDH_Y"] and df["Fit_Y"]
     ndh_y = df["NDH_Y"].to_numpy()
     fit_y = df["Fit_Y"].to_numpy()
-    ndh_x = df["NDH_X"].to_numpy()
+    ndh_x = df["NDH_X"].to_numpy() # Same as Molar_Ratio_Raw
     fit_x = df["Fit_X"].to_numpy()
 
     # Remove all Nan values
@@ -136,6 +136,14 @@ def plot_itc_new(df, output, energy_unit):
         has_overlap_bool = has_overlap(ax, 0, 1)
 
     # Save figure
+    common_xlim = ax[1].get_xlim()       
+    ax[1].set_xlim(common_xlim)
+    ax[2].set_xlim(common_xlim)
+
+
+    ax[1].tick_params(axis='x', which='both',
+                  bottom=False, top=False, labelbottom=False)
+
     plt.savefig(output, dpi=600, bbox_inches='tight')
 
 
