@@ -1,0 +1,132 @@
+[Main]
+//uncomment following line to define functions using outside of this scope
+//@global=1;
+// Set the name of the original workbook
+//[Section 1]
+string bkn$ = "Book1";
+
+// Create a new workbook named "Smoothed"
+newbook name:="Smoothed";
+string newbkn$ = %H;
+
+// Get the number of columns in the original workbook
+int ncols = [bkn$]1!wks.nCols;
+
+// Loop through all columns and copy the data
+for (int col = 1; col <= ncols; col++) {
+    // Ensure the new workbook has enough columns
+    if ([newbkn$]1!wks.nCols < col) {
+        wks.addCol();
+    }
+    // Copy the data from each column in Book1 to Smoothed
+    range r1 = [bkn$]1!col($(col));
+    range r2 = [newbkn$]1!col($(col));
+    copydata r1 r2;
+}
+
+// Loop through all Y-columns to smooth the data (assuming first column is X)
+for (int col = 2; col <= ncols; col++) {
+    // Smooth the Y-columns and place them in the corresponding column in the new workbook
+    smooth iy:=[newbkn$]1!col($(col)) oy:=[newbkn$]1!col($(col)) npts:=13; // npts:=13;  21
+}
+
+peakNCols = [newbkn$]1!wks.nCols;
+
+// Rename the remaining columns in the Peaks workbook to have the same long names as in Book1
+for (int j = 1; j <= peakNCols; j++) {
+    // Get the long name from the original workbook (adjusting for the correct Y-column index)
+    string longName$ = [bkn$]1!col($(j))[L]$;
+    // Apply the long name to the corresponding column in the Peaks workbook
+    //[peaksbkn$]1!col($(j))[L]$ = longName$;
+    col($(j))[L]$ = longName$;
+    col($(j))[C]$ = "";
+}
+
+
+//[Section 2]
+// Create a new workbook named "Derivative"
+newbook name:="Derivative";
+string derivbkn$ = %H;
+
+// Copy the data from the "Smoothed" workbook to the "Derivative" workbook
+for (int col = 1; col <= ncols; col++) {
+    // Ensure the new workbook has enough columns
+    if ([derivbkn$]1!wks.nCols < col) {
+        wks.addCol();
+    }
+    // Copy the data from each column in Smoothed to Derivative
+    range r1 = [newbkn$]1!col($(col));
+    range r2 = [derivbkn$]1!col($(col));
+    copydata r1 r2;
+}
+
+// Calculate the first derivative for all Y-columns in the "Derivative" workbook (assuming first column is X)
+for (int col = 2; col <= ncols; col++) {
+    // Calculate the first derivative and place it in the corresponding column in the "Derivative" workbook
+    differentiate iy:=[derivbkn$]1!col($(col)) oy:=[derivbkn$]1!col($(col));
+}
+
+// Normalize the data
+//for (int col = 2; col <= ncols; col++) {
+    //Calculate the first derivative and place it in the corresponding column in the "Derivative" workbook
+    //col($(col)) /= max(col($(col)))
+//}
+
+peakNCols = [derivbkn$]1!wks.nCols;
+
+ //Rename the remaining columns in the Peaks workbook to have the same long names as in Book1
+for (int j = 1; j <= peakNCols; j++) {
+    // Get the long name from the original workbook (adjusting for the correct Y-column index)
+    string longName$ = [bkn$]1!col($(j))[L]$;
+    // Apply the long name to the corresponding column in the Peaks workbook
+    //[peaksbkn$]1!col($(j))[L]$ = longName$;
+    col($(j))[L]$ = longName$;
+    col($(j))[C]$ = "";
+}
+
+
+
+//[Section 3]
+
+newbook name:="Peaks";
+string peaksbkn$ = %H;
+
+
+
+// Get the number of columns in the "Derivative" workbook
+//int ncols = [derivbkn$]1!wks.nCols;
+
+// Loop through all Y-columns in the "Derivative" workbook to find peaks
+for (int col = 2; col <= ncols; col++) {
+
+    
+    // Apply the pkFind function to the current column
+    //pkFind -r 2 iy:=[derivbkn$]1!(1,$(col)) ocenter:=<new> ocenter_x:=<new>;
+    //pkFind -r 2 iy:=[derivbkn$]1!(1,$(col)) ocenter:=[peaksbkn$]Sheet1!<new> ocenter_x:=[peaksbkn$]Sheet1!<new>;
+    pkFind iy:=[derivbkn$]1!(1,$(col)) ocenter:=[peaksbkn$]Sheet1!<new> ocenter_x:=[peaksbkn$]Sheet1!<new>;
+}
+//[Section 4]
+// Get the number of columns in the Peaks workbook
+int peakNCols = [peaksbkn$]1!wks.nCols;
+
+
+// Get the number of columns in the Peaks workbook
+int peakNCols = [peaksbkn$]1!wks.nCols;
+
+for (int peakCol = peakNCols -1; peakCol > 0; peakCol = peakCol-2) {
+    delete col($(peakCol));  
+}
+
+// Get the updated number of columns in the Peaks workbook after deletion
+peakNCols = [peaksbkn$]1!wks.nCols;
+
+// Rename the remaining columns in the Peaks workbook to have the same long names as in Book1
+for (int j = 1; j <= peakNCols; j++) {
+    // Get the long name from the original workbook (adjusting for the correct Y-column index)
+    string longName$ = [bkn$]1!col($(j))[L]$;
+    // Apply the long name to the corresponding column in the Peaks workbook
+    //[peaksbkn$]1!col($(j))[L]$ = longName$;
+    col($(j))[L]$ = longName$;
+}
+
+delete col(1)
