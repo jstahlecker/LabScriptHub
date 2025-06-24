@@ -47,3 +47,9 @@ The repository is structured as follows:
    ```
 
 ---
+
+## 🤝 Contributing, Bugs & Requests
+
+If you have ideas for new features, improvements, or bug fixes, feel free to message me.
+
+---
