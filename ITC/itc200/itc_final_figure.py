@@ -172,7 +172,14 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Plot ITC data from a CSV file.")
-    parser.add_argument('yaml_config', type=Path, help='Path to the YAML configuration file.')
+    parser.add_argument('yaml_config', 
+                        nargs='?', 
+                        default=None,
+                        help='Path to the YAML configuration file (default: ./input.yaml)')
+
     args = parser.parse_args()
+    if args.yaml_config is None:
+        print("No YAML config provided, using default: ./input.yaml")
+        args.yaml_config = './input.yaml'  # Default config file
 
     main(args.yaml_config)
