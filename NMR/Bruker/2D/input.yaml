@@ -1,0 +1,24 @@
+FILES:
+  - FILENAME: FILENAME.ucsf
+    #COLOR: tab:blue 
+    LABEL: "TestA$_1$" # For special charecters, it is best to use quotes
+    CONTOUR: 1e7 # Specify countour level
+    #CONTOUR_NUM: 14 # Default is 14
+    #CONTOUR_FACTOR: 1.4 # Default is 1.4
+    NEGATIVE: 
+      #COLOR: "tab:red"
+      LABEL: "FA$_b$ - Af1503 ep (negative)"
+
+  - FILENAME: FILENAME2.ucsf
+    #COLOR: "tab:orange" 
+    LABEL: Test2
+    CONTOUR: 1e7
+
+
+# Global settings
+#OUTPUT_FOLDER: /path/to/output/folder
+OUTPUT_NAME: "test.png"
+X_LIM:  # If nothing is set, use entire sweep width
+  - 11.5
+  - 5.5
+#Y_LIM:  # If nothing is set, use entire sweep width
