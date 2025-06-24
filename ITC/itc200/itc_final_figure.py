@@ -71,7 +71,7 @@ def plot_itc_new(df, output, energy_unit):
     ndh_y = df["NDH_Y"].to_numpy()
     fit_y = df["Fit_Y"].to_numpy()
     ndh_x = df["NDH_X"].to_numpy() # Same as Molar_Ratio_Raw
-    fit_x = df["Fit_X"].to_numpy()
+    fit_x = df["Fit_X"].to_numpy() # Same as Molar_Ratio_Fit
 
     # Remove all Nan values
     ndh_y = ndh_y[~np.isnan(ndh_y)]
