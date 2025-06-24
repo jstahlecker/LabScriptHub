@@ -9,7 +9,8 @@ The repository is structured as follows:
 - **`DSF/`**  
   Scripts for Differential Scanning Fluorimetry (DSF) data analysis.  
   - **`nanoDSF/`**: Scripts and configurations for nanoDSF experiments.  
-  - **`Qiagen_RotorGeneQ/`**: Preprocessing scripts for DSF data from the Qiagen Rotor-Gene Q machine.  
+  - **`Qiagen_RotorGeneQ/`**: Preprocessing scripts for DSF data from the Qiagen Rotor-Gene Q machine.
+  -  **`Origin/`**: A small Add-on script to automate smoothing, differentiation and basic peak detection using Origin.
 
 - **`ITC/`**  
   Scripts for Isothermal Titration Calorimetry (ITC) data analysis.  
