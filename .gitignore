@@ -196,3 +196,4 @@ cython_debug/
 # Folder for testing
 #DSF/*/sandbox/*
 **/sandbox/
+**/DS_Store/
