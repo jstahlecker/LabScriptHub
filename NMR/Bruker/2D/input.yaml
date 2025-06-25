@@ -18,6 +18,8 @@ FILES:
 # Global settings
 #OUTPUT_FOLDER: /path/to/output/folder
 OUTPUT_NAME: "test.png"
+#X_AXIS_LABEL: '$\omega_2 - ^{1}$H [ppm]' # Use single quotes to avoid YAML parsing issues. 1H is default
+#Y_AXIS_LABEL: '$\omega_1 - ^{15}$N [ppm]' # Use single quotes to avoid YAML parsing issues. 15N is default
 X_LIM:  # If nothing is set, use entire sweep width
   - 11.5
   - 5.5

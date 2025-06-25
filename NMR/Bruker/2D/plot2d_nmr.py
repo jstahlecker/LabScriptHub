@@ -9,7 +9,7 @@ mpl.rcParams["mathtext.fontset"] = "dejavuserif" # nicer omega symbol
 mpl.rcParams["contour.negative_linestyle"] = "solid" # make negative contours solid
 
 
-def hsqc_plot(input_list, output_name, xlimits, ylimits):
+def hsqc_plot(input_list, output_name, xlimits, ylimits, x_axis_label, y_axis_label):
     ### Plotting stuff ###
 
     fig = plt.figure()
@@ -53,9 +53,9 @@ def hsqc_plot(input_list, output_name, xlimits, ylimits):
                 labels.append(neg_label)
                 legend_info.append(contour.legend_elements()[0][0]) # add the negative contour
 
-    # decorate the axes and set limits
-    ax.set_ylabel(r"$\omega_1 - ^{15}$N [ppm]")
-    ax.set_xlabel(r"$\omega_2 - ^{1}$H [ppm]")
+    ax.set_xlabel(x_axis_label)
+    ax.set_ylabel(y_axis_label)
+    
 
     if xlimits is not None:
         x0, x1 = xlimits
@@ -102,6 +102,10 @@ def main(yaml_config):
     xlimits = cfg.get('X_LIM', None)
     ylimits = cfg.get('Y_LIM', None)
 
+    x_axis_label = cfg.get('X_AXIS_LABEL', r"$\omega_2 - ^{1}$H [ppm]")
+    y_axis_label = cfg.get('Y_AXIS_LABEL', r"$\omega_1 - ^{15}$N [ppm]")
+
+
 
     all_input_list = []
     for entry in file_entries:
@@ -132,7 +136,7 @@ def main(yaml_config):
 
 
     # Do Plotting
-    hsqc_plot(all_input_list, output_name, xlimits, ylimits)
+    hsqc_plot(all_input_list, output_name, xlimits, ylimits, x_axis_label, y_axis_label)
 
 
 if __name__ == "__main__":
