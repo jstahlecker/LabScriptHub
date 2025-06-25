@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import filedialog
 import sys
 
-from itc_final_figure import *
+from itc_final_figure import plot_itc
 
 
 # Create a simple GUI to select file and set options
@@ -15,12 +15,14 @@ class ITCFinalFigureGUI:
         self.master = master
         master.title("ITC Final Figure Generator")
 
+        self.file_paths = []
+
         # File selection
         self.file_label = tk.Label(master, text="Input CSV File:")
         self.file_label.grid(row=0, column=0, sticky="e")
         self.file_entry = tk.Entry(master, width=40)
         self.file_entry.grid(row=0, column=1)
-        self.browse_button = tk.Button(master, text="Browse...", command=self.browse_file)
+        self.browse_button = tk.Button(master, text="Browse...", command=self.browse_files)
         self.browse_button.grid(row=0, column=2)
 
         # Separator
@@ -48,31 +50,37 @@ class ITCFinalFigureGUI:
         self.run_button = tk.Button(master, text="Generate Figure", command=self.run)
         self.run_button.grid(row=4, column=1, pady=10)
 
-    def browse_file(self):
-        file_path = filedialog.askopenfilename(
-            title="Select input CSV file",
+    def browse_files(self):
+        files = filedialog.askopenfilenames(
+            title="Select one or more CSV files",
             filetypes=[("CSV files", "*.csv")]
         )
-        if file_path:
+        if files:
+            self.file_paths = list(files)
+            # show just the first + count
+            display = f"{Path(files[0]).name}"
+            if len(files) > 1:
+                display += f"  (+{len(files)-1} more)"
             self.file_entry.delete(0, tk.END)
-            self.file_entry.insert(0, file_path)
+            self.file_entry.insert(0, display)
 
     def run(self):
-        input_file_path = self.file_entry.get()
+        if not self.file_paths:
+            print("No files selected. Exiting.")
+            return
+
         sep = self.sep_entry.get()
         decimal = self.decimal_entry.get()
         energy_unit = self.energy_entry.get()
 
-        if not input_file_path:
-            print("No file selected. Exiting.")
-            return
+        for fp in self.file_paths:
+            inp = Path(fp)
+            out = inp.parent / (inp.stem + ".png")
+            df = pd.read_csv(inp, sep=sep, decimal=decimal)
+            plot_itc(df, out, energy_unit=energy_unit)
+            print(f"Figure saved to {out}")
 
-        INPUT_FILE = Path(input_file_path)
-        output_file = INPUT_FILE.parent / (INPUT_FILE.stem + ".png")
-
-        df = pd.read_csv(INPUT_FILE, sep=sep, decimal=decimal)
-        plot_itc(df, output_file, energy_unit=energy_unit)
-        print(f"Figure saved to {output_file}")
+        # cleanup
         plt.close("all")
         self.master.destroy()
         sys.exit(0)
