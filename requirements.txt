@@ -22,3 +22,4 @@ tzdata==2025.2
 uncertainties==3.2.3
 wheel==0.45.1
 xlrd==2.0.2
+PySide6==6.9.1
