@@ -9,7 +9,7 @@ mpl.rcParams["mathtext.fontset"] = "dejavuserif" # nicer omega symbol
 mpl.rcParams["contour.negative_linestyle"] = "solid" # make negative contours solid
 
 
-def hsqc_plot(input_list, output_name, xlimits, ylimits, x_axis_label, y_axis_label):
+def hsqc_plot(input_list, output_name, xlimits, ylimits, x_axis_label, y_axis_label, no_legend):
     ### Plotting stuff ###
 
     fig = plt.figure()
@@ -37,8 +37,9 @@ def hsqc_plot(input_list, output_name, xlimits, ylimits, x_axis_label, y_axis_la
             color = next(color_iter) # get the next color from the default color cycle
         
         contour = ax.contour(data, cl, colors=color, extent=(x0, x1, y0, y1), linewidths=0.5)
-        labels.append(label)
-        legend_info.append(contour.legend_elements()[0][0])
+        if label is not None:
+            labels.append(label)
+            legend_info.append(contour.legend_elements()[0][0])
 
         # if neg_list is not None:
         if neg_list is not None:
@@ -73,9 +74,10 @@ def hsqc_plot(input_list, output_name, xlimits, ylimits, x_axis_label, y_axis_la
 
 
     #Create a legend for the contour set
-    legend = ax.legend(legend_info, labels, loc="upper left", fontsize=10)
-    for line in legend.get_lines():
-        line.set_linewidth(2) 
+    if not no_legend:
+        legend = ax.legend(legend_info, labels, loc="upper left", fontsize=10)
+        for line in legend.get_lines():
+            line.set_linewidth(2) 
 
         
     plt.tight_layout()
@@ -111,8 +113,8 @@ def main(yaml_config):
     for entry in file_entries:
         fname     = Path(entry['FILENAME'])
         color   = entry.get('COLOR', None)
-        label  = entry['LABEL']
-        contour = float(entry['CONTOUR'])
+        label  = entry.get('LABEL', None)
+        contour = float(entry.get('CONTOUR', 1e7))
         contour_num = entry.get('CONTOUR_NUM', 14)
         contour_factor = entry.get('CONTOUR_FACTOR', 1.4)
         negative = entry.get('NEGATIVE', False)
@@ -134,9 +136,14 @@ def main(yaml_config):
         file_input_list = [fname, color, label, cl, neg_list]
         all_input_list.append(file_input_list)
 
-
+    no_legend = True
+    # If any label is not None, set no_legend to False
+    for entry in all_input_list:
+        if entry[2] is not None:
+            no_legend = False
+            break
     # Do Plotting
-    hsqc_plot(all_input_list, output_name, xlimits, ylimits, x_axis_label, y_axis_label)
+    hsqc_plot(all_input_list, output_name, xlimits, ylimits, x_axis_label, y_axis_label, no_legend)
 
 
 if __name__ == "__main__":
