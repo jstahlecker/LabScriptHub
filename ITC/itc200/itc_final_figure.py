@@ -128,9 +128,9 @@ def plot_itc(df, output, energy_unit):
 
     # Sanity Check for Plots 0 and 1
     has_overlap_bool = has_overlap(ax, 0, 1)
-    new_buffer_size = 1
+    new_buffer_size = 0.1
     while has_overlap_bool:
-        new_buffer_size += 1
+        new_buffer_size += 0.2
         ax[1].set_ylim([ax[1].get_ylim()[0], ax[1].get_ylim()[1] + new_buffer_size])
         plt.draw()  # Ensures ticks/labels are updated
         has_overlap_bool = has_overlap(ax, 0, 1)
