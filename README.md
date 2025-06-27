@@ -54,3 +54,20 @@ The repository is structured as follows:
 If you have ideas for new features, improvements, or bug fixes, feel free to message me.
 
 ---
+
+## 🙏 Acknowledgements
+
+This project relies on the contributions of numerous open-source package maintainers. Special thanks to the developers of the following libraries:
+
+- **nmrglue**: For providing tools to process NMR data.
+- **numpy**: For efficient numerical computations.
+- **matplotlib**: For creating high-quality plots and visualizations.
+- **pandas**: For powerful data manipulation and analysis.
+- **scipy**: For scientific computing and advanced mathematical functions.
+- **PySide6**: For enabling GUI development.
+- **pyyaml**: For YAML configuration handling.
+- **uncertainties**: For managing error propagation in calculations.
+
+Your work makes projects like this possible. Thank you!
+
+---
