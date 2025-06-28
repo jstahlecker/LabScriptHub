@@ -25,6 +25,7 @@ The repository is structured as follows:
   - **`CLARIOstar/`**: Preprocessing scripts for fluorescence polarization assays.  
 
 - **`HPLC/`**
+  Scripts for HPLC plotting and analysis.
   - **`ÄKTA/`**  
     Scripts for diagram plotting and analysis of ÄKTA chromatography data.  
     - **`pure/`**: Tools for visualizing and annotating chromatography run for the Äkta pure. 
