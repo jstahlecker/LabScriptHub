@@ -221,5 +221,17 @@ def main(yaml_config):
 
 
 
-
-main("input.yaml")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Plot data from an ÄKTA chromatography run using a YAML config.')
+    parser.add_argument(
+        "yaml_config",
+        nargs="?",
+        default=None,
+        help="Path to the YAML configuration file (default: ./input.yaml)"
+    )
+    args = parser.parse_args()
+    if args.yaml_config is None:
+        print("No YAML config provided, using default: ./input.yaml")
+        args.yaml_config = './input.yaml'  # Default config file
+    main(args.yaml_config)
