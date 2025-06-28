@@ -1,0 +1,17 @@
+FILES:
+  - FILENAME: FILENAME.csv
+    TYPE:
+      - UV_280 # If a special Wavelength was used (e.g. 260, 230) write UV_230
+      #- Conc B # Either Conc B or Cond
+      - Cond # Either Conc B or Cond
+    #FRACTION_GROUPS:
+    #  - START: 1.B.7
+    #    END: 1.B.3
+    #  - START: 1.E.8
+    #    END: 2.A.3
+
+#OUTPUT_FOLDER: "." # Default is current folder
+#OUTPUT: plot.png
+SHOW_FRACTIONS: False # True
+#X_START: 30
+#X_END: 200
