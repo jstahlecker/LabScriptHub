@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import filedialog
 import sys
 
-from itc_final_figure import plot_itc
+from itc_final_figure import plot_itc, apply_seaborn_style
 
 
 # Create a simple GUI to select file and set options
@@ -45,10 +45,14 @@ class ITCFinalFigureGUI:
         self.energy_entry = tk.Entry(master, width=15)
         self.energy_entry.insert(0, "kcal / mol")
         self.energy_entry.grid(row=3, column=1, sticky="w")
+        # Seaborn style option
+        self.use_seaborn_var = tk.BooleanVar(value=False)
+        self.seaborn_checkbox = tk.Checkbutton(master, text="Use seaborn style", variable=self.use_seaborn_var)
+        self.seaborn_checkbox.grid(row=4, column=0, columnspan=3, sticky="w")
 
         # Run button
         self.run_button = tk.Button(master, text="Generate Figure", command=self.run)
-        self.run_button.grid(row=4, column=1, pady=10)
+        self.run_button.grid(row=5, column=1, pady=10)
 
     def browse_files(self):
         files = filedialog.askopenfilenames(
@@ -72,6 +76,10 @@ class ITCFinalFigureGUI:
         sep = self.sep_entry.get()
         decimal = self.decimal_entry.get()
         energy_unit = self.energy_entry.get()
+        use_seaborn = self.use_seaborn_var.get()
+
+        if use_seaborn:
+            apply_seaborn_style({"style": "ticks", "context": "paper"})
 
         for fp in self.file_paths:
             inp = Path(fp)

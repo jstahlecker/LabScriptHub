@@ -20,9 +20,10 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QMainWindow,
-)
+    QCheckBox,
+)  
 
-from itc_final_figure import plot_itc  # your plotting helper
+from itc_final_figure import plot_itc, apply_seaborn_style
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -99,6 +100,11 @@ class MainWindow(QMainWindow):
         self.dec_edit = self._labeled_edit("Decimal Symbol", ".", opts_row)
         self.energy_edit = self._labeled_edit("Energy Unit", "kcal / mol", opts_row)
         root.addLayout(opts_row)
+        # Seaborn style option
+        style_row = QHBoxLayout()
+        self.seaborn_cb = QCheckBox("Use seaborn style")
+        style_row.addWidget(self.seaborn_cb)
+        root.addLayout(style_row)
 
         # 3) output folder picker
         out_row = QHBoxLayout()
@@ -164,6 +170,10 @@ class MainWindow(QMainWindow):
         dec = self.dec_edit.text() or "."
         energy = self.energy_edit.text() or "kcal / mol"
         out_folder = self.output_dir if self.output_dir else None
+        use_seaborn = self.seaborn_cb.isChecked()
+
+        if use_seaborn:
+            apply_seaborn_style({"style": "ticks", "context": "paper"})
 
         try:
             for fp in list(self.file_paths):  # clone list because we may mutate it
