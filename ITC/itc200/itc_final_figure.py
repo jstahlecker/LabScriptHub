@@ -5,6 +5,11 @@ from pathlib import Path
 import yaml
 import argparse
 
+
+def apply_seaborn_style(param_dict):
+    import seaborn as sns
+    sns.set_theme(**param_dict)
+
 def get_visible_label_boxes(axis):
     # Returns a list of (label_text, bounding_box) for visible y-tick labels
     boxes = []
@@ -148,9 +153,16 @@ def plot_itc(df, output, energy_unit):
 
 
 def main(yaml_config: Path):
+
     # Load YAML
     with open(yaml_config, 'r') as f:
         cfg = yaml.safe_load(f)
+    
+    seaborn_flag = cfg.get('USE_SEABORN', False)
+    if seaborn_flag:
+        seaborn_params = cfg.get('SEABORN_PARAMS', {"style": "ticks", "context": "paper"})
+        apply_seaborn_style(seaborn_params)
+
 
     # Required
     input_file = Path(cfg['FILENAME'])

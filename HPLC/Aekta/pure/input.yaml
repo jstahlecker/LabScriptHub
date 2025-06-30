@@ -15,3 +15,8 @@ FILES:
 SHOW_FRACTIONS: False # True
 #X_START: 30
 #X_END: 200
+
+#USE_SEABORN: True  # Use seaborn style for plots
+#SEABORN_PARAMS:
+#  style: "ticks"
+#  context: "paper"

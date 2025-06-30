@@ -9,6 +9,11 @@ mpl.rcParams["mathtext.fontset"] = "dejavuserif" # nicer omega symbol
 mpl.rcParams["contour.negative_linestyle"] = "solid" # make negative contours solid
 
 
+def apply_seaborn_style(param_dict):
+    import seaborn as sns
+    sns.set_theme(**param_dict)
+
+
 def hsqc_plot(input_list, output_name, xlimits, ylimits, x_axis_label, y_axis_label, no_legend):
     ### Plotting stuff ###
 
@@ -89,6 +94,11 @@ def main(yaml_config):
     # Load YAML config
     with open(yaml_config, 'r') as f:
         cfg = yaml.safe_load(f)
+
+    seaborn_flag = cfg.get('USE_SEABORN', False)
+    if seaborn_flag:
+        seaborn_params = cfg.get('SEABORN_PARAMS', {"style": "ticks", "context": "paper"})
+        apply_seaborn_style(seaborn_params)
 
     file_entries = cfg.get('FILES', [])
     if not file_entries:

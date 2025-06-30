@@ -6,3 +6,7 @@ FILENAME: FILENAME.csv
 #ENERGY_UNIT: kcal / mol
 #DELIMITER: "," # Use quotes
 #DECIMAL: "." # Use quotes
+#USE_SEABORN: True  # Use seaborn style for plots
+#SEABORN_PARAMS:
+#  style: "ticks"
+#  context: "paper"

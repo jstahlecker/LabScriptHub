@@ -73,6 +73,7 @@ This project relies on the contributions of numerous open-source package maintai
 - **PySide6**: For enabling GUI development.
 - **pyyaml**: For YAML configuration handling.
 - **uncertainties**: For managing error propagation in calculations.
+- **seaborn**: For plot styling options
 
 Your work makes projects like this possible. Thank you!
 

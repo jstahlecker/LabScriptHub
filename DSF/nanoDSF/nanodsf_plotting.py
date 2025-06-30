@@ -12,6 +12,10 @@ def read_data(filename):
     df_first_deriv = pd.read_excel(filename, sheet_name='Ratio (1st deriv.)', header=0)
     return df_overview, df_ratio, df_first_deriv
 
+def apply_seaborn_style(param_dict):
+    import seaborn as sns
+    sns.set_theme(**param_dict)
+
 def filter_data(df_ratio, df_first_deriv, capillary_list):
     """Filter and extract arrays for specified capillaries"""
     # Clean column names
@@ -65,6 +69,11 @@ def main(yaml_config):
     # Load YAML config
     with open(yaml_config, 'r') as f:
         cfg = yaml.safe_load(f)
+
+    seaborn_flag = cfg.get('USE_SEABORN', False)
+    if seaborn_flag:
+        seaborn_params = cfg.get('SEABORN_PARAMS', {"style": "ticks", "context": "paper"})
+        apply_seaborn_style(seaborn_params)
 
     file_entries = cfg.get('FILES', [])
     if not file_entries:

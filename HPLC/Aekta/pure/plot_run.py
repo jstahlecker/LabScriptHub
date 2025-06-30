@@ -11,6 +11,9 @@ uv_colors = {
     "UV_230": "tab:red",
 }
 
+def apply_seaborn_style(param_dict):
+    import seaborn as sns
+    sns.set_theme(**param_dict)
 
 def get_columns(fn, what_to_plot):
     """
@@ -183,6 +186,12 @@ def main(yaml_config):
     # Load YAML config
     with open(yaml_config, 'r') as f:
         cfg = yaml.safe_load(f)
+
+
+    seaborn_flag = cfg.get('USE_SEABORN', False)
+    if seaborn_flag:
+        seaborn_params = cfg.get('SEABORN_PARAMS', {"style": "ticks", "context": "paper"})
+        apply_seaborn_style(seaborn_params)
 
     file_entries = cfg.get('FILES', [])
 
