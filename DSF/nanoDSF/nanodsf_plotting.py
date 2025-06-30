@@ -28,7 +28,7 @@ def filter_data(df_ratio, df_first_deriv, capillary_list):
         data[cap_str] = (temps, ratio_vec, deriv_vec)
     return data
 
-def plot_combined(data_entries, output_name, temp_min=None, temp_max=None):
+def plot_combined(data_entries, output_path, temp_min=None, temp_max=None):
     """Plot all entries on a single figure, respecting optional colors"""
     fig, axes = plt.subplots(2, 1, sharex=True)
     default_colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -57,8 +57,7 @@ def plot_combined(data_entries, output_name, temp_min=None, temp_max=None):
     plt.subplots_adjust(hspace=0)
     fig.align_ylabels(axes[:])
 
-    out_path = Path(output_name) if output_name else Path('combined_plot.png')
-    plt.savefig(out_path, dpi=600, bbox_inches='tight')
+    plt.savefig(output_path, dpi=600, bbox_inches='tight')
     plt.close(fig)
 
 
@@ -72,9 +71,13 @@ def main(yaml_config):
         raise ValueError("Config YAML must contain a 'FILES' list with at least one entry.")
 
     # Global parameters
-    output_name = cfg.get('OUTPUT_NAME', 'nanodsf_plot.png')
-    temp_min    = cfg.get('TEMP_MIN', None)
-    temp_max    = cfg.get('TEMP_MAX', None)
+    output_folder = Path(cfg.get('OUTPUT_FOLDER', '.'))
+    output_name   = cfg.get('OUTPUT_NAME', 'nanodsf_plot.png')
+    if not Path(output_name).suffix:
+        output_name += '.png'
+    output_path   = output_folder / output_name
+    temp_min      = cfg.get('TEMP_MIN', None)
+    temp_max      = cfg.get('TEMP_MAX', None)
     
 
 
@@ -102,7 +105,7 @@ def main(yaml_config):
                 label = f"{Path(fn).stem}_Cap{cap_str}"
             combined_entries.append((temps, ratio, deriv, label, color))
 
-    plot_combined(combined_entries, output_name, temp_min, temp_max)
+    plot_combined(combined_entries, output_path, temp_min, temp_max)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

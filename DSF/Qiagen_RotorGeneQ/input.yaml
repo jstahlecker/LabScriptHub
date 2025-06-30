@@ -1,4 +1,4 @@
 FILENAME: "FILENAME.xls"
 
-#OUTPUT_FOLDER: path/to/output/folder
-#OUTPUT_NAME: Test # .xlsx will be added automatically
+#OUTPUT_FOLDER: "."        # Default output folder
+#OUTPUT_NAME: "Test"       # .xlsx will be added automatically

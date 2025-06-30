@@ -19,6 +19,7 @@ FILES:
 
 
 # Output settings
+OUTPUT_FOLDER: "."  # Default output folder
 OUTPUT_NAME: "combined.png"  # Name of the resulting plot or figure
 #TEMP_MIN: START                 # Minimum temperature (°C)
 #TEMP_MAX: END                   # Maximum temperature (°C)

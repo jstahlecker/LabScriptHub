@@ -10,8 +10,8 @@ FILES:
     #  - START: 1.E.8
     #    END: 2.A.3
 
-#OUTPUT_FOLDER: "." # Default is current folder
-#OUTPUT: plot.png
+#OUTPUT_FOLDER: "."  # Default is current folder
+#OUTPUT_NAME: "plot.png"
 SHOW_FRACTIONS: False # True
 #X_START: 30
 #X_END: 200

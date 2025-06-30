@@ -1,8 +1,8 @@
 FILENAME: FILENAME.csv
 
 
-#OUTPUT_FOLDER: /path/to/output/folder
-#OUTPUT_NAME: NAME
+#OUTPUT_FOLDER: "."         # Default output folder
+#OUTPUT_NAME: "NAME"       # Name of output PNG (extension added automatically)
 #ENERGY_UNIT: kcal / mol
 #DELIMITER: "," # Use quotes
 #DECIMAL: "." # Use quotes

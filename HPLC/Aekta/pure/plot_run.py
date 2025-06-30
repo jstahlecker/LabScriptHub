@@ -192,7 +192,7 @@ def main(yaml_config):
         'show_fractions': cfg.get('SHOW_FRACTIONS', False),
         'x_start': cfg.get('X_START', None),
         'x_end': cfg.get('X_END', None),
-        'output_name': make_output_name(cfg.get('OUTPUT_FOLDER', '.'), cfg.get('OUTPUT', 'aekta_plot.png'))
+        'output_name': make_output_name(cfg.get('OUTPUT_FOLDER', '.'), cfg.get('OUTPUT_NAME', 'aekta_plot.png'))
     }
 
     if not file_entries:
