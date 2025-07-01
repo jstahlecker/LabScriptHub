@@ -71,32 +71,23 @@ def plot_itc(df, output, energy_unit):
     ax[1].set_ylabel(f'{energy_unit} of injectant')
     ax[1].tick_params(axis='both', which='major', labelsize=8)
 
-    # Plot Residuals
-    # Remove all Nan values of df["NDH_Y"] and df["Fit_Y"]
-    ndh_y = df["NDH_Y"].to_numpy()
-    fit_y = df["Fit_Y"].to_numpy()
-    ndh_x = df["NDH_X"].to_numpy() # Same as Molar_Ratio_Raw
-    fit_x = df["Fit_X"].to_numpy()
+    # Calculate residuals
+    ndh = (
+        df[["NDH_X", "NDH_Y"]]
+        .dropna()                
+        .set_index("NDH_X")["NDH_Y"]
+    )
 
-    # Remove all Nan values
-    ndh_y = ndh_y[~np.isnan(ndh_y)]
-    fit_y = fit_y[~np.isnan(fit_y)]
-    ndh_x = ndh_x[~np.isnan(ndh_x)]
-    fit_x = fit_x[~np.isnan(fit_x)]
+    fit = (
+        df[["Fit_X", "Fit_Y"]]
+        .dropna()
+        .set_index("Fit_X")["Fit_Y"]
+    )
 
-    # Make (x,y) pairs so that we can calculate the residuals if the x value is the same
-    ndh = np.column_stack((ndh_x, ndh_y))
-    fit = np.column_stack((fit_x, fit_y))
+    residual = (ndh - fit).dropna()         # rows with no match become NaN
 
-    # Find the residuals
-    residuals = []
-    for i in range(len(ndh)):
-        for j in range(len(fit)):
-            if ndh[i][0] == fit[j][0]:
-                residuals.append((fit[j][0] ,ndh[i][1] - fit[j][1]))
-
-    res_x = [i[0] for i in residuals]
-    res_y = [i[1] for i in residuals]
+    res_x = residual.index.to_numpy()
+    res_y = residual.to_numpy()
 
 
     ax[2].scatter(res_x, res_y, marker='s', color="black", label='NDH', sizes=(10,10))
