@@ -1,7 +1,10 @@
 import pandas as pd
 from pathlib import Path
 import argparse
+import logging
 import yaml
+
+logging.basicConfig( level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 def read_data(file_path: Path) -> pd.DataFrame:
     """
@@ -63,7 +66,7 @@ def main(yaml_config: Path):
 
     # 4) Write
     result_df.to_excel(out_path, index=False)
-    print(f"Written reorganized data to {out_path}")
+    logging.info("Written reorganized data to %s", out_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -76,6 +79,6 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     if args.yaml_config is None:
-        print("No YAML config provided, using default: ./input.yaml")
+        logging.info("No YAML config provided, using default: ./input.yaml")
         args.yaml_config = './input.yaml'  # Default config file
     main(args.yaml_config)

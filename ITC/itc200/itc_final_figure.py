@@ -4,6 +4,9 @@ import pandas as pd
 from pathlib import Path
 import yaml
 import argparse
+import logging
+
+logging.basicConfig( level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 
 def apply_seaborn_style(param_dict):
@@ -180,7 +183,6 @@ def main(yaml_config: Path):
     plot_itc(df, output_name, energy_unit)
 
 if __name__ == "__main__":
-    import argparse
 
     parser = argparse.ArgumentParser(description="Plot ITC data from a CSV file.")
     parser.add_argument('yaml_config', 
@@ -190,7 +192,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     if args.yaml_config is None:
-        print("No YAML config provided, using default: ./input.yaml")
+        logging.info("No YAML config provided, using default: ./input.yaml")
         args.yaml_config = './input.yaml'  # Default config file
 
     main(args.yaml_config)

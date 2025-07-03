@@ -1,9 +1,12 @@
 import yaml
+import logging
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
 from pathlib import Path
+
+logging.basicConfig( level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 def read_data(filename):
     """Read data from .xlsx"""
@@ -127,6 +130,6 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     if args.yaml_config is None:
-        print("No YAML config provided, using default: ./input.yaml")
+        logging.info("No YAML config provided, using default: ./input.yaml")
         args.yaml_config = './input.yaml'  # Default config file
     main(args.yaml_config)

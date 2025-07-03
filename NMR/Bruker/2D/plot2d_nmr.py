@@ -3,11 +3,13 @@ import nmrglue as ng
 import numpy as np
 import yaml
 import argparse
+import logging
 from pathlib import Path
 import matplotlib as mpl
 mpl.rcParams["mathtext.fontset"] = "dejavuserif" # nicer omega symbol
 mpl.rcParams["contour.negative_linestyle"] = "solid" # make negative contours solid
 
+logging.basicConfig( level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 def apply_seaborn_style(param_dict):
     import seaborn as sns
@@ -168,7 +170,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.yaml_config is None:
-        print("No YAML specified, defaulting to ./input.yaml")
+        logging.info("No YAML specified, defaulting to ./input.yaml")
         args.yaml_config = "input.yaml"
     
     main(args.yaml_config)

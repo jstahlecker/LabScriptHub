@@ -1,12 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import logging
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
 import sys
 
 from itc_final_figure import plot_itc, apply_seaborn_style
+
+logging.basicConfig( level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 
 # Create a simple GUI to select file and set options
@@ -70,7 +73,7 @@ class ITCFinalFigureGUI:
 
     def run(self):
         if not self.file_paths:
-            print("No files selected. Exiting.")
+            logging.info("No files selected. Exiting.")
             return
 
         sep = self.sep_entry.get()
@@ -86,7 +89,7 @@ class ITCFinalFigureGUI:
             out = inp.parent / (inp.stem + ".png")
             df = pd.read_csv(inp, sep=sep, decimal=decimal)
             plot_itc(df, out, energy_unit=energy_unit)
-            print(f"Figure saved to {out}")
+            logging.info(f"Figure saved to {out}")
 
         # cleanup
         plt.close("all")

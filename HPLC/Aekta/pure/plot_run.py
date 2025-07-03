@@ -2,8 +2,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
 import argparse
+import logging
+import sys
 from pathlib import Path
 import matplotlib as mpl
+
+logging.basicConfig( level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 uv_colors = {
     "UV_280": "tab:blue",
@@ -193,33 +197,39 @@ def main(yaml_config):
         seaborn_params = cfg.get('SEABORN_PARAMS', {"style": "ticks", "context": "paper"})
         apply_seaborn_style(seaborn_params)
 
-    file_entries = cfg.get('FILES', [])
-
     # global parameters
-
     global_params = {
         'show_fractions': cfg.get('SHOW_FRACTIONS', False),
         'x_start': cfg.get('X_START', None),
         'x_end': cfg.get('X_END', None),
         'output_name': make_output_name(cfg.get('OUTPUT_FOLDER', '.'), cfg.get('OUTPUT_NAME', 'aekta_plot.png'))
     }
-
+    
+    file_entries = cfg.get('FILES', [])
     if not file_entries:
         raise ValueError("Config YAML must contain a 'FILES' list with at least one entry.")
+
+    if len(file_entries) > 1:
+        logging.error("For now, only one file is supported.")
+        sys.exit(1)
     
     all_plot_data = []
     for entry in file_entries:
         if 'FILENAME' not in entry:
-            raise ValueError("Each entry in 'FILES' must contain a 'FILENAME' key.")
+            logging.error("Each entry in 'FILES' must contain a 'FILENAME' key.")
+            sys.exit(1)
         
         fn = Path(entry['FILENAME'])
         what_to_plot = entry.get('TYPE', [])
         if not what_to_plot:
-            raise ValueError("Config YAML must contain a 'TYPE' key with the data type to plot.")
+            logging.error("Each entry in 'FILES' must contain a 'TYPE' key with the data type to plot.")
+            sys.exit(1)
         elif len(what_to_plot) > 2:
-            raise ValueError("Config YAML 'TYPE' key must contain at most two data types.")
+            logging.error("Config YAML 'TYPE' key must contain at most two data types.")
+            sys.exit(1)
         if not any("UV" in t for t in what_to_plot):
-            raise ValueError("Config YAML 'TYPE' key must contain at least one 'UV' type.")
+            logging.error("Config YAML 'TYPE' key must contain at least one 'UV' type.")
+            sys.exit(1)
         fraction_group = entry.get('FRACTION_GROUPS', None)
 
         all_plot_data.append((fn, what_to_plot, fraction_group))
@@ -241,6 +251,6 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     if args.yaml_config is None:
-        print("No YAML config provided, using default: ./input.yaml")
+        logging.info("No YAML config provided, using default: ./input.yaml")
         args.yaml_config = './input.yaml'  # Default config file
     main(args.yaml_config)
