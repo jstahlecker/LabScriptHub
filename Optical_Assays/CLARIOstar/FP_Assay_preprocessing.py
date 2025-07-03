@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 from uncertainties import ufloat
 import yaml
+import logging
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 def process_file(input_file: Path, output_folder: Path, output_name: str, skiprows=None, sheet_name="All Cycles", reference_standard="Standard S12"):
     # 1) Read the sheet, with skiprows if provided
@@ -62,7 +64,7 @@ def process_file(input_file: Path, output_folder: Path, output_name: str, skipro
     # 10) Write out
     output_file = output_folder / output_name
     final.to_excel(output_file, index=False)
-    print(f"✔️ Processed data written to {output_file}")
+    logging.info(f"Processed data written to {output_file}")
 
 def main(yaml_config: Path):
     # Load YAML
