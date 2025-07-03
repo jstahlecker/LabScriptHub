@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 from pathlib import Path
-
 import pandas as pd
 import numpy as np
 from uncertainties import ufloat
@@ -91,9 +90,18 @@ def main(yaml_config: Path):
     process_file(input_file, output_folder, output_name=output_name, skiprows=skiprows, sheet_name=sheet_name, reference_standard=reference_standard)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Process a polarization-time Excel file per a YAML config.'
+    parser = argparse.ArgumentParser(description='Process a polarization-time Excel file per a YAML config.')
+    parser.add_argument(
+        "yaml_config",
+        nargs="?",
+        default=None,
+        help="Path to the YAML configuration file (default: ./input.yaml)"
     )
-    parser.add_argument('yaml_config', help='Path to your input.yaml')
+    
     args = parser.parse_args()
-    main(Path(args.yaml_config))
+
+    if args.yaml_config is None:
+        logging.info("No YAML specified, defaulting to ./input.yaml")
+        args.yaml_config = "input.yaml"
+    
+    main(args.yaml_config)
