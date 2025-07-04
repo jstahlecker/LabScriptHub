@@ -13,6 +13,14 @@ def apply_seaborn_style(param_dict):
     import seaborn as sns
     sns.set_theme(**param_dict)
 
+def round_up_to_half(x):
+    down_round = np.floor(x * 2) / 2
+    if down_round == 0:
+        # round up to nearest 0.1
+        return round(x, 1)
+    else:
+        return down_round
+
 def get_visible_label_boxes(axis):
     # Returns a list of (label_text, bounding_box) for visible y-tick labels
     boxes = []
@@ -121,7 +129,8 @@ def plot_itc(df, output, energy_unit):
         buffer_size += 0.2
         ax[2].set_ylim([lower_limit - buffer_size, upper_limit + buffer_size])
         ax[2].tick_params(axis='both', which='major', labelsize=8)
-        ax[2].set_yticks([lower_limit, 0, upper_limit])
+        new_limit = round_up_to_half(upper_limit + buffer_size/4)
+        ax[2].set_yticks([-new_limit, 0, new_limit])
         plt.draw()  # Ensures ticks/labels are updated
         has_overlap_bool = has_overlap(ax, 1, 2)
 
