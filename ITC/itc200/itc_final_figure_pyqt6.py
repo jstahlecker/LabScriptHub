@@ -4,6 +4,9 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from functools import partial   # handy for binding common args
+
 import pandas as pd
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QColor, QPalette
@@ -25,10 +28,23 @@ from PySide6.QtWidgets import (
 
 from itc_final_figure import plot_itc, apply_seaborn_style
 
+def process_file(fp: Path,
+                 sep: str,
+                 dec: str,
+                 energy: str,
+                 out_folder: Path | None,
+                 use_seaborn: bool) -> str:
+    """
+    Read one CSV, make the ITC figure and return the path of the PNG.
+    Defined at top level so it can be pickled by multiprocessing on Windows.
+    """
+    if use_seaborn:
+        apply_seaborn_style({"style": "ticks", "context": "paper"})
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Custom list widget to support drag‑and‑drop
-# ──────────────────────────────────────────────────────────────────────────────
+    df = pd.read_csv(fp, sep=sep, decimal=dec)
+    out_path = (out_folder or fp.parent) / f"{fp.stem}.png"
+    plot_itc(df, out_path, energy_unit=energy)
+    return str(out_path)
 
 
 class FileListWidget(QListWidget):
@@ -166,28 +182,57 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "No files", "Add at least one CSV file first.")
             return
 
-        sep = self.sep_edit.text() or ","
-        dec = self.dec_edit.text() or "."
-        energy = self.energy_edit.text() or "kcal / mol"
+        sep       = self.sep_edit.text() or ","
+        dec       = self.dec_edit.text() or "."
+        energy    = self.energy_edit.text() or "kcal / mol"
         out_folder = self.output_dir if self.output_dir else None
-        use_seaborn = self.seaborn_cb.isChecked()
+        use_sns   = self.seaborn_cb.isChecked()
 
-        if use_seaborn:
-            apply_seaborn_style({"style": "ticks", "context": "paper"})
+        # Freeze the UI button so the user cannot click twice
+        self.setEnabled(False)
+
+        # Bind the constant arguments once
+        worker = partial(process_file,
+                        sep=sep,
+                        dec=dec,
+                        energy=energy,
+                        out_folder=out_folder,
+                        use_seaborn=use_sns)
 
         try:
-            for fp in list(self.file_paths):  # clone list because we may mutate it
-                df = pd.read_csv(fp, sep=sep, decimal=dec)
-                out_path = (out_folder or fp.parent) / f"{fp.stem}.png"
-                plot_itc(df, out_path, energy_unit=energy)
-            QMessageBox.information(self, "Done", "Figures generated successfully.")
-        except Exception as exc:  # noqa: BLE001
-            QMessageBox.critical(self, "Error", str(exc))
-            return
+            # One process per logical core by default
+            with ProcessPoolExecutor() as pool:
+                futures = {pool.submit(worker, fp): fp for fp in self.file_paths}
+
+                # Optional: basic progress feedback
+                done_cnt = 0
+                total = len(futures)
+                for fut in as_completed(futures):
+                    try:
+                        result_path = fut.result()      # raises if that job failed
+                        done_cnt += 1
+                    except Exception as exc:
+                        QMessageBox.critical(
+                            self,
+                            "Error",
+                            f"Failed on {futures[fut].name}:\n{exc}"
+                        )
+                        return  # bail out early
+
+                    # Keep the event loop alive so the window repaints
+                    QApplication.processEvents()
+
+            QMessageBox.information(
+                self,
+                "Done",
+                f"Generated {done_cnt} figure{'s' if done_cnt!=1 else ''} successfully."
+            )
+
         finally:
-            # Always clear UI list
+            # UI clean-up – always
             self.file_list.clear()
             self.file_paths.clear()
+            self.setEnabled(True)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
