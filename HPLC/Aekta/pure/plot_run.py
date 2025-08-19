@@ -114,7 +114,7 @@ def plot_run(input_list, global_params):
                         ax_left.axvline(x=fraction, ymin=0, ymax=0.07, color="grey", linewidth=0.6)
                         text = f_no[index]
                         if "Waste" not in text:
-                            ax.text(fraction, 0.07*(ax.get_ylim()[1]-ax.get_ylim()[0])+ax.get_ylim()[0] ,text, ha="center", va="bottom", size=8, rotation=22.5)
+                            ax_left.text(fraction, 0.07*(ax_left.get_ylim()[1]-ax_left.get_ylim()[0])+ax_left.get_ylim()[0] ,text, ha="center", va="bottom", size=8, rotation=22.5)
                     ax_left.axvline(x=fraction, ymin=0, ymax=0.05, color="grey", linewidth=0.6)
                 
             if fraction_group is not None:
