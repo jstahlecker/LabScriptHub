@@ -65,15 +65,15 @@ If you have ideas for new features, improvements, or bug fixes, feel free to ope
 
 This project relies on the contributions of numerous open-source package maintainers. Special thanks to the developers of the following libraries:
 
-- **nmrglue**: For providing tools to process NMR data.
-- **numpy**: For efficient numerical computations.
-- **matplotlib**: For creating high-quality plots and visualizations.
-- **pandas**: For powerful data manipulation and analysis.
-- **scipy**: For scientific computing and advanced mathematical functions.
-- **PySide6**: For enabling GUI development.
-- **pyyaml**: For YAML configuration handling.
-- **uncertainties**: For managing error propagation in calculations.
-- **seaborn**: For plot styling options
+- **[nmrglue](https://www.nmrglue.com/)**: For providing tools to process NMR data.
+- **[numpy](https://numpy.org/)**: For efficient numerical computations.
+- **[matplotlib](https://matplotlib.org/)**: For creating high-quality plots and visualizations.
+- **[pandas](https://pandas.pydata.org/)**: For powerful data manipulation and analysis.
+- **[scipy](https://scipy.org/)**: For scientific computing and advanced mathematical functions.
+- **[PySide6](https://doc.qt.io/qtforpython/)**: For enabling GUI development.
+- **[pyyaml](https://pyyaml.org/)**: For YAML configuration handling.
+- **[uncertainties](https://uncertainties.readthedocs.io/en/latest/)**: For managing error propagation in calculations.
+- **[seaborn](https://seaborn.pydata.org/)**: For plot styling options
 
 Your work makes projects like this possible. Thank you!
 
