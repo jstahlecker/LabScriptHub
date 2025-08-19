@@ -136,7 +136,6 @@ def main(yaml_config):
         if negative:
             neg_color = negative.get("COLOR", None)
             neg_label = negative.get("LABEL", None)
-            neg_contours = -1 * cl
             neg_contours = (-cl)[::-1]
 
             neg_list = [neg_color, neg_contours, neg_label]
