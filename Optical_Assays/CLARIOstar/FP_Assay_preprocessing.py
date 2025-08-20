@@ -6,6 +6,7 @@ import numpy as np
 from uncertainties import ufloat
 import yaml
 import logging
+import sys
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 def process_file(input_file: Path, output_folder: Path, output_name: str, skiprows=None, sheet_name="All Cycles", reference_standard="Standard S12"):
@@ -40,7 +41,11 @@ def process_file(input_file: Path, output_folder: Path, output_name: str, skipro
     final.columns = ['Group', 'Content', 'Mean', 'Std']
 
     # 6) Sort by Group, then numerically by Content
-    final['Content_Num'] = final['Content'].str.extract(r'(\d+)').astype(int)
+    try:
+        final['Content_Num'] = final['Content'].str.extract(r'(\d+)').astype(int)
+    except ValueError:
+        logging.error("A numeric value could not be extracted from 'Content'. To sort the values, they need numbers from 1-X.\nAborting")
+        sys.exit(1)
     final = final.sort_values(['Group', 'Content_Num']).drop('Content_Num', axis=1)
 
     # 7) Create ufloats and subtract reference

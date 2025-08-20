@@ -84,6 +84,8 @@ def main(yaml_config):
 
     # Global parameters
     output_folder = Path(cfg.get('OUTPUT_FOLDER', '.'))
+    output_folder.mkdir(parents=True, exist_ok=True)
+    
     output_name   = cfg.get('OUTPUT_NAME', 'nanodsf_plot.png')
     if not Path(output_name).suffix:
         output_name += '.png'

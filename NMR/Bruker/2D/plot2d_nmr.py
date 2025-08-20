@@ -108,6 +108,8 @@ def main(yaml_config):
 
     # Global parameters
     output_folder = cfg.get('OUTPUT_FOLDER', '.')
+    output_folder.mkdir(parents=True, exist_ok=True)
+    
     output_name = cfg.get('OUTPUT_NAME', 'output_plot')
     if not output_name.endswith('.png'):
         output_name += '.png'
