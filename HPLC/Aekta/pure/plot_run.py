@@ -148,7 +148,7 @@ def plot_run(input_list, global_params):
         all_labels  = labels_left  + labels_right
 
         # Place legend (you can tweak loc as needed)
-        ax_left.legend(all_handles, all_labels, loc='upper left')
+        ax_left.legend(all_handles, all_labels, loc='best')
         if not plotted_on_right:
             ax_right.set_visible(False)
         
