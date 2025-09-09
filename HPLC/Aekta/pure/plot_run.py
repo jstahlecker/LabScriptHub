@@ -160,12 +160,9 @@ def plot_run(input_list, global_params):
         elif global_params['x_end'] is not None:
             ax_left.set_xlim(ax_left.get_xlim()[0], global_params['x_end'])
         
-        # Add the x ticks
-        # Configure ticks - only show on X-axis
+        # Add x minor ticks and ensure left Y ticks are visible
         ax_left.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(10))
-        
-        # If you want to keep the left y-axis label but hide ticks:
-        ax_left.tick_params(axis='y', which='both', left=False, labelleft=True)
+        ax_left.tick_params(axis='y', which='both', left=True, labelleft=True)
         plt.tight_layout()
         #plt.show()
         plt.savefig(global_params['output_name'], dpi=600)
