@@ -127,7 +127,7 @@ def plot_run(input_list, global_params):
                     frac_end = fraction["END"]
 
                     frac_start_index = get_fraction_index(f_no, frac_start)
-                    frac_end_index = get_fraction_index(f_no, frac_end)
+                    frac_end_index = get_fraction_index(f_no, frac_end) +1
                     ax_left.axvspan(f_ml[frac_start_index], f_ml[frac_end_index], color='blue', alpha=0.1)
 
         ax_left.set_xlabel('Volume [mL]')
