@@ -194,14 +194,6 @@ def main(yaml_config):
         seaborn_params = cfg.get('SEABORN_PARAMS', {"style": "ticks", "context": "paper"})
         apply_seaborn_style(seaborn_params)
 
-    # global parameters
-    global_params = {
-        'show_fractions': cfg.get('SHOW_FRACTIONS', False),
-        'x_start': cfg.get('X_START', None),
-        'x_end': cfg.get('X_END', None),
-        'output_name': make_output_name(cfg.get('OUTPUT_FOLDER', '.'), cfg.get('OUTPUT_NAME', 'aekta_plot.png'))
-    }
-    
     file_entries = cfg.get('FILES', [])
     if not file_entries:
         raise ValueError("Config YAML must contain a 'FILES' list with at least one entry.")
@@ -209,6 +201,19 @@ def main(yaml_config):
     if len(file_entries) > 1:
         logging.error("For now, only one file is supported.")
         sys.exit(1)
+
+    # global parameters
+    # make default name
+    first_filename_as_default = Path(file_entries[0]["FILENAME"]).stem + ".png"
+
+    global_params = {
+        'show_fractions': cfg.get('SHOW_FRACTIONS', False),
+        'x_start': cfg.get('X_START', None),
+        'x_end': cfg.get('X_END', None),
+        'output_name': make_output_name(cfg.get('OUTPUT_FOLDER', '.'), cfg.get('OUTPUT_NAME') or first_filename_as_default)
+    }
+    
+
     
     all_plot_data = []
     for entry in file_entries:
