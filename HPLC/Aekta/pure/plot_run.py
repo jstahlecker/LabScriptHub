@@ -91,6 +91,7 @@ def plot_run(input_list, global_params):
                     plotted_on_left = True
                     label = f"UV ({plot_type.split('_')[1]} nm)"
                     color = uv_colors.get(plot_type, None)
+                    y += global_params['y_offset_UV']
                 else:
                     ax = ax_right
                     plotted_on_right = True
@@ -210,7 +211,8 @@ def main(yaml_config):
         'show_fractions': cfg.get('SHOW_FRACTIONS', False),
         'x_start': cfg.get('X_START', None),
         'x_end': cfg.get('X_END', None),
-        'output_name': make_output_name(cfg.get('OUTPUT_FOLDER', '.'), cfg.get('OUTPUT_NAME') or first_filename_as_default)
+        'output_name': make_output_name(cfg.get('OUTPUT_FOLDER', '.'), cfg.get('OUTPUT_NAME') or first_filename_as_default),
+        'y_offset_UV': cfg.get('Y_OFFSET_UV', 0)
     }
     
 
