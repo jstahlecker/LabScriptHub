@@ -7,6 +7,7 @@ FILES:
     #FRACTION_GROUPS:
     #  - START: 1.B.7
     #    END: 1.B.3
+    #    COLOR: "green" # Blue is default
     #  - START: 1.E.8
     #    END: 2.A.3
 

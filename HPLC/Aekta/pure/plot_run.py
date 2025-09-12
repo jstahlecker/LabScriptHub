@@ -6,8 +6,9 @@ import logging
 import sys
 from pathlib import Path
 import matplotlib as mpl
+import numpy as np
 
-logging.basicConfig( level=logging.INFO, format='[%(levelname)s] %(message)s')
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
 uv_colors = {
     "UV_280": "tab:blue",
@@ -33,7 +34,7 @@ def get_columns(fn, what_to_plot):
     
 
     # Special case: UV_280 needs both tokens in one header cell
-    if what_to_plot == "UV_280":
+    if what_to_plot.startswith("UV_"):
         token1, token2 = what_to_plot.split('_')
         for idx, col_name in enumerate(header):
             if token1 in col_name and token2 in col_name:
@@ -55,6 +56,16 @@ def get_fraction_index(f_no, f_name):
         raise ValueError(f"Fraction '{f_name}' not found in f_no list: {f_no}")
     return index
 
+def compute_plot_order(what_to_plot):
+    """
+    Plot order policy:
+      - Plot all non-UV traces first (keep input order).
+      - Then plot UV traces in reverse input order so that the first
+        listed UV wavelength is plotted last (on top).
+    """
+    uv = [t for t in what_to_plot if t.startswith("UV_")]
+    non_uv = [t for t in what_to_plot if not t.startswith("UV_")]
+    return non_uv + uv[::-1]
 
 def plot_run(input_list, global_params):
     """
@@ -75,7 +86,11 @@ def plot_run(input_list, global_params):
         for fn, what_to_plot, fraction_group in input_list:
             df = pd.read_csv(fn, header=2, delimiter='\t', encoding='UTF-16')
 
-            for plot_type in what_to_plot:
+            #what_to_plot_sorted = [s for _, s in sorted(enumerate(what_to_plot), key=lambda x: sort_what_to_plot(x[1], x[0]))]
+            what_to_plot_sorted = compute_plot_order(what_to_plot)
+            print(f"Plotting in order: {what_to_plot_sorted}")
+
+            for plot_type in what_to_plot_sorted:
                 # Find the column index for this plot_type
                 col_idx = get_columns(fn, plot_type)
                 if col_idx is None:
@@ -117,7 +132,10 @@ def plot_run(input_list, global_params):
                         if "Waste" not in text:
                             ax_left.text(fraction, 0.07*(ax_left.get_ylim()[1]-ax_left.get_ylim()[0])+ax_left.get_ylim()[0] ,text, ha="center", va="bottom", size=8, rotation=22.5)
                     ax_left.axvline(x=fraction, ymin=0, ymax=0.05, color="grey", linewidth=0.6)
-                
+
+            # Get Y-min-limit of left axis
+            y_min_left = ax_left.get_ylim()[0]
+            y_max_left = ax_left.get_ylim()[1]   
             if fraction_group is not None:
                 for fraction in fraction_group:
                     f_ml_index = get_columns(fn, "Fraction")
@@ -129,7 +147,29 @@ def plot_run(input_list, global_params):
 
                     frac_start_index = get_fraction_index(f_no, frac_start)
                     frac_end_index = get_fraction_index(f_no, frac_end) +1
-                    ax_left.axvspan(f_ml[frac_start_index], f_ml[frac_end_index], color='blue', alpha=0.1)
+                    area_color = fraction.get('COLOR', 'blue')
+                    #ax_left.axvspan(f_ml[frac_start_index], f_ml[frac_end_index], color=area_color, alpha=0.1)
+                    # find UV trace to fill under (use first UV type present)
+                    uv_type = next((t for t in what_to_plot if "UV" in t), None) # Get first UV type
+                    if uv_type is None:
+                        continue
+                    col_uv = get_columns(fn, uv_type)
+                    x_uv = df.iloc[:, col_uv].values
+                    y_uv = df.iloc[:, col_uv + 1].values.astype(float)
+                    # apply same y offset used when plotting UV
+                    # ensure the indices are ordered and within bounds of f_ml
+                    i0, i1 = sorted([frac_start_index, frac_end_index])
+                    i0 = max(0, i0)
+                    i1 = min(i1, len(f_ml) - 1)
+
+                    x0, x1 = f_ml[i0], f_ml[i1]
+
+                    # mask the interval on the UV x-axis and fill to baseline=0
+                    m = (x_uv >= x0) & (x_uv <= x1)
+                    if m.any():
+                        # Get min of y_uv
+                        y_uv_min = np.min(y_uv)
+                        ax_left.fill_between(x_uv, y_uv, y_min_left,where=m, interpolate=True, color=area_color, alpha=0.2)
 
         ax_left.set_xlabel('Volume [mL]')
 
@@ -160,7 +200,10 @@ def plot_run(input_list, global_params):
             ax_left.set_xlim(global_params['x_start'], ax_left.get_xlim()[1])
         elif global_params['x_end'] is not None:
             ax_left.set_xlim(ax_left.get_xlim()[0], global_params['x_end'])
-        
+
+        if plotted_on_left:
+            ax_left.set_ylim(y_min_left, y_max_left)
+    
         # Add x minor ticks and ensure left Y ticks are visible
         ax_left.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(10))
         ax_left.tick_params(axis='y', which='both', left=True, labelleft=True)
@@ -228,8 +271,10 @@ def main(yaml_config):
         if not what_to_plot:
             logging.error("Each entry in 'FILES' must contain a 'TYPE' key with the data type to plot.")
             sys.exit(1)
-        elif len(what_to_plot) > 2:
-            logging.error("Config YAML 'TYPE' key must contain at most two data types.")
+        uv_count = sum(1 for t in what_to_plot if "UV" in t)
+        different_plot_types = len(what_to_plot) - uv_count
+        if different_plot_types > 2:
+            logging.error("Config YAML 'TYPE' key must contain at most two different data types.")
             sys.exit(1)
         if not any("UV" in t for t in what_to_plot):
             logging.error("Config YAML 'TYPE' key must contain at least one 'UV' type.")
