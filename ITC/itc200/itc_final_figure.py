@@ -14,12 +14,14 @@ def apply_seaborn_style(param_dict):
     sns.set_theme(**param_dict)
 
 def round_up_to_half(x):
-    down_round = np.floor(x * 2) / 2
-    if down_round == 0:
-        # round up to nearest 0.1
-        return round(x, 1)
-    else:
-        return down_round
+
+    try:
+        # scalar case
+        return float(np.ceil(x * 2) / 2)
+    except Exception:
+        # array-like: return numpy array result
+        arr = np.asarray(x)
+        return np.ceil(arr * 2) / 2
 
 def get_visible_label_boxes(axis):
     # Returns a list of (label_text, bounding_box) for visible y-tick labels
