@@ -154,7 +154,7 @@ def plot_itc(df, output, energy_unit):
     ax[1].tick_params(axis='x', which='both',
                   bottom=False, top=False, labelbottom=False)
 
-    plt.savefig(output, dpi=600)#, bbox_inches='tight')
+    plt.savefig(output, dpi=600, bbox_inches='tight')
     #Close the figure
     plt.close()
 
