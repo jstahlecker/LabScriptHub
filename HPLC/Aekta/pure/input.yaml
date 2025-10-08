@@ -16,6 +16,8 @@ FILES:
 SHOW_FRACTIONS: False # True
 #X_START: 30
 #X_END: 200
+#Y_MIN_UV: None
+#Y_MAX_UV: None
 #Y_OFFSET_UV: 0
 
 #USE_SEABORN: True  # Use seaborn style for plots

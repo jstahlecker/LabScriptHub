@@ -130,7 +130,16 @@ def plot_run(input_list, global_params):
                         ax_left.axvline(x=fraction, ymin=0, ymax=0.07, color="grey", linewidth=0.6)
                         text = f_no[index]
                         if "Waste" not in text:
-                            ax_left.text(fraction, 0.07*(ax_left.get_ylim()[1]-ax_left.get_ylim()[0])+ax_left.get_ylim()[0] ,text, ha="center", va="bottom", size=8, rotation=22.5)
+                            ax_left.text(
+                                fraction,
+                                0.07,
+                                text,
+                                transform=ax_left.get_xaxis_transform(),
+                                ha="center",
+                                va="bottom",
+                                size=8,
+                                rotation=22.5,
+                            )
                     ax_left.axvline(x=fraction, ymin=0, ymax=0.05, color="grey", linewidth=0.6)
 
             # Get Y-min-limit of left axis
@@ -167,9 +176,20 @@ def plot_run(input_list, global_params):
                     # mask the interval on the UV x-axis and fill to baseline=0
                     m = (x_uv >= x0) & (x_uv <= x1)
                     if m.any():
-                        # Get min of y_uv
-                        y_uv_min = np.min(y_uv)
-                        ax_left.fill_between(x_uv, y_uv, y_min_left,where=m, interpolate=True, color=area_color, alpha=0.2)
+                        baseline = (
+                            global_params['y_min_uv']
+                            if global_params['y_min_uv'] is not None
+                            else y_min_left
+                        )
+                        ax_left.fill_between(
+                            x_uv,
+                            y_uv,
+                            baseline,
+                            where=m,
+                            interpolate=True,
+                            color=area_color,
+                            alpha=0.2,
+                        )
 
         ax_left.set_xlabel('Volume [mL]')
 
@@ -202,8 +222,13 @@ def plot_run(input_list, global_params):
             ax_left.set_xlim(ax_left.get_xlim()[0], global_params['x_end'])
 
         if plotted_on_left:
-            ax_left.set_ylim(y_min_left, y_max_left)
-    
+            y_lower, y_upper = y_min_left, y_max_left
+            if global_params['y_min_uv'] is not None:
+                y_lower = global_params['y_min_uv']
+            if global_params['y_max_uv'] is not None:
+                y_upper = global_params['y_max_uv']
+            ax_left.set_ylim(y_lower, y_upper)
+
         # Add x minor ticks and ensure left Y ticks are visible
         ax_left.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(10))
         ax_left.tick_params(axis='y', which='both', left=True, labelleft=True)
@@ -255,7 +280,9 @@ def main(yaml_config):
         'x_start': cfg.get('X_START', None),
         'x_end': cfg.get('X_END', None),
         'output_name': make_output_name(cfg.get('OUTPUT_FOLDER', '.'), cfg.get('OUTPUT_NAME') or first_filename_as_default),
-        'y_offset_UV': cfg.get('Y_OFFSET_UV', 0)
+        'y_offset_UV': cfg.get('Y_OFFSET_UV', 0),
+        'y_min_uv': cfg.get('Y_MIN_UV', None),
+        'y_max_uv': cfg.get('Y_MAX_UV', None),
     }
     
 
