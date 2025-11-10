@@ -27,19 +27,36 @@ def get_columns(fn, what_to_plot):
     Otherwise, looks for an exact header match.
     """
     # Read only the second line of the file
-    with open(fn, 'r', encoding="utf-16") as f:
-        f.readline()  # skip first line
-        second_line = f.readline().strip()
-        header = second_line.split('\t')
+    try:
+        with open(fn, 'r', encoding="utf-16") as f:
+            f.readline()  # skip first line
+            second_line = f.readline().strip()
+            header = second_line.split('\t')
+
+    except UnicodeDecodeError as e:
+        logging.info(f"Error reading file {fn}: {e} with encoding UTF-16. Trying UTF-8.")
+        with open(fn, 'r', encoding="utf-8") as f:
+            f.readline()  # skip first line
+            second_line = f.readline().strip()
+            header = second_line.split(',')
+
+        
     
 
     # Special case: UV_280 needs both tokens in one header cell
-    if what_to_plot.startswith("UV_"):
-        token1, token2 = what_to_plot.split('_')
-        for idx, col_name in enumerate(header):
-            if token1 in col_name and token2 in col_name:
-                return idx
-        raise ValueError(f"No column containing both '{token1}' and '{token2}' found in headers: {header}")
+    try:
+        if what_to_plot.startswith("UV_"):
+            token1, token2 = what_to_plot.split('_')
+            for idx, col_name in enumerate(header):
+                if token1 in col_name and token2 in col_name:
+                    return idx
+            raise ValueError(f"No column containing both '{token1}' and '{token2}' found in headers: {header}")
+
+    except ValueError as e:
+        uv_index = header.index("UV")
+        logging.warning(f"Assuming there is only one UV in the file (Column index {uv_index}). Using that for '{what_to_plot}'.")
+        return uv_index
+
 
     # General case: exact match in header list
     if what_to_plot in header:
@@ -84,7 +101,11 @@ def plot_run(input_list, global_params):
     if len(input_list) == 1:
 
         for fn, what_to_plot, fraction_group in input_list:
-            df = pd.read_csv(fn, header=2, delimiter='\t', encoding='UTF-16')
+            try:
+                df = pd.read_csv(fn, header=2, delimiter='\t', encoding='UTF-16')
+            except UnicodeDecodeError as e:
+                logging.info(f"Error reading file {fn}: {e} with encoding UTF-16. Trying UTF-8.")
+                df = pd.read_csv(fn, header=2, delimiter=',', encoding='UTF-8')
 
             #what_to_plot_sorted = [s for _, s in sorted(enumerate(what_to_plot), key=lambda x: sort_what_to_plot(x[1], x[0]))]
             what_to_plot_sorted = compute_plot_order(what_to_plot)
@@ -104,7 +125,10 @@ def plot_run(input_list, global_params):
                 if "UV" in plot_type:
                     ax = ax_left
                     plotted_on_left = True
-                    label = f"UV ({plot_type.split('_')[1]} nm)"
+                    try:
+                        label = f"UV ({plot_type.split('_')[1]} nm)"
+                    except IndexError:
+                        label = "UV"
                     color = uv_colors.get(plot_type, None)
                     y += global_params['y_offset_UV']
                 else:
