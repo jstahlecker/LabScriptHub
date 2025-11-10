@@ -107,7 +107,7 @@ def main(yaml_config):
         raise ValueError("Config YAML must contain a 'FILES' list with at least one entry.")
 
     # Global parameters
-    output_folder = cfg.get('OUTPUT_FOLDER', '.')
+    output_folder = Path(cfg.get('OUTPUT_FOLDER', '.'))
     output_folder.mkdir(parents=True, exist_ok=True)
     
     output_name = cfg.get('OUTPUT_NAME', 'output_plot')
