@@ -6,7 +6,6 @@ import logging
 import sys
 from pathlib import Path
 import matplotlib as mpl
-import numpy as np
 
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
@@ -86,69 +85,78 @@ def compute_plot_order(what_to_plot):
 
 def plot_run(input_list, global_params):
     """
-    input_list: list of (Path or filename, list of plot_type strings)
+    input_list: list of (Path or filename, list of plot_type strings,
+                        fraction groups, color, uv_offset_override,
+                        scaling_factor, legend_label)
     """
 
-    # Create main figure + left axis
     fig, ax_left = plt.subplots(figsize=(10, 6))
-    # Create right axis that shares the same x-axis
     ax_right = ax_left.twinx()
 
-    # Keep track of which axes have had data plotted, for legends
     plotted_on_left = False
     plotted_on_right = False
+    y_min_left = None
+    y_max_left = None
+    fractions_drawn = False
+    non_uv_types_seen = set()
 
-    if len(input_list) == 1:
+    for fn, what_to_plot, fraction_group, file_color, file_uv_offset, scaling_factor, legend_label in input_list:
+        logging.info(f"Processing file: {fn}")
+        try:
+            df = pd.read_csv(fn, header=2, delimiter='\t', encoding='UTF-16')
+        except UnicodeDecodeError as e:
+            logging.info(f"Error reading file {fn}: {e} with encoding UTF-16. Trying UTF-8.")
+            df = pd.read_csv(fn, header=2, delimiter=',', encoding='UTF-8')
 
-        for fn, what_to_plot, fraction_group in input_list:
-            try:
-                df = pd.read_csv(fn, header=2, delimiter='\t', encoding='UTF-16')
-            except UnicodeDecodeError as e:
-                logging.info(f"Error reading file {fn}: {e} with encoding UTF-16. Trying UTF-8.")
-                df = pd.read_csv(fn, header=2, delimiter=',', encoding='UTF-8')
+        what_to_plot_sorted = compute_plot_order(what_to_plot)
+        print(f"Plotting in order: {what_to_plot_sorted}")
 
-            #what_to_plot_sorted = [s for _, s in sorted(enumerate(what_to_plot), key=lambda x: sort_what_to_plot(x[1], x[0]))]
-            what_to_plot_sorted = compute_plot_order(what_to_plot)
-            print(f"Plotting in order: {what_to_plot_sorted}")
+        for plot_type in what_to_plot_sorted:
+            col_idx = get_columns(fn, plot_type)
+            if col_idx is None:
+                raise ValueError(f"Column for '{plot_type}' not found in file: {fn}")
 
-            for plot_type in what_to_plot_sorted:
-                # Find the column index for this plot_type
-                col_idx = get_columns(fn, plot_type)
-                if col_idx is None:
-                    raise ValueError(f"Column for '{plot_type}' not found in file: {fn}")
+            x = df.iloc[:, col_idx].values
+            y = df.iloc[:, col_idx + 1].values.astype(float)
 
-                # Extract x and y
-                x = df.iloc[:, col_idx].values
-                y = df.iloc[:, col_idx + 1].values
-
-                # Choose axis based on plot_type
-                if "UV" in plot_type:
-                    ax = ax_left
-                    plotted_on_left = True
+            if "UV" in plot_type:
+                ax = ax_left
+                plotted_on_left = True
+                if legend_label:
+                    label = legend_label
+                else:
                     try:
                         label = f"UV ({plot_type.split('_')[1]} nm)"
                     except IndexError:
                         label = "UV"
-                    color = uv_colors.get(plot_type, None)
-                    y += global_params['y_offset_UV']
+                y_offset = file_uv_offset if file_uv_offset is not None else global_params['y_offset_UV']
+                y = (y * scaling_factor) + y_offset
+                color = file_color or uv_colors.get(plot_type, None)
+            else:
+                ax = ax_right
+                plotted_on_right = True
+                non_uv_types_seen.add(plot_type)
+                if plot_type == "Conc B":
+                    color = "tab:green"
+                    label = "Concentration B"
+                elif plot_type == "Cond":
+                    color = "tab:brown"
+                    label = "Conductivity"
                 else:
-                    ax = ax_right
-                    plotted_on_right = True
-                    if plot_type == "Conc B":
-                        color = "tab:green"
-                        label = "Concentration B"
-                    elif plot_type == "Cond":
-                        color = "tab:brown"
-                        label = "Conductivity"
+                    color = None
+                    label = plot_type
 
-                # Plot
-                ax.plot(x, y, label=label, color=color)
+            ax.plot(x, y, label=label, color=color)
 
-            if global_params['show_fractions']:
+        if global_params['show_fractions'] and not fractions_drawn:
+            try:
                 f_ml_index = get_columns(fn, "Fraction")
-                f_no_index = f_ml_index + 1
                 f_ml = df.iloc[:, f_ml_index].dropna().values
-                f_no = df.iloc[:, f_no_index].dropna().values
+                f_no = df.iloc[:, f_ml_index + 1].dropna().values
+            except ValueError as exc:
+                logging.warning(f"Could not draw fractions for {fn}: {exc}")
+            else:
+                fractions_drawn = True
                 for index, fraction in enumerate(f_ml):
                     if index == 0 or (index + 1) % 5 == 0:
                         ax_left.axvline(x=fraction, ymin=0, ymax=0.07, color="grey", linewidth=0.6)
@@ -166,102 +174,94 @@ def plot_run(input_list, global_params):
                             )
                     ax_left.axvline(x=fraction, ymin=0, ymax=0.05, color="grey", linewidth=0.6)
 
-            # Get Y-min-limit of left axis
-            y_min_left = ax_left.get_ylim()[0]
-            y_max_left = ax_left.get_ylim()[1]   
-            if fraction_group is not None:
-                for fraction in fraction_group:
-                    f_ml_index = get_columns(fn, "Fraction")
-                    f_no_index = f_ml_index + 1
-                    f_ml = df.iloc[:, f_ml_index].dropna().values
-                    f_no = df.iloc[:, f_no_index].dropna().values
-                    frac_start = fraction["START"]
-                    frac_end = fraction["END"]
+        if fraction_group is not None:
+            y_min_current = ax_left.get_ylim()[0]
+            for fraction in fraction_group:
+                f_ml_index = get_columns(fn, "Fraction")
+                f_no_index = f_ml_index + 1
+                f_ml = df.iloc[:, f_ml_index].dropna().values
+                f_no = df.iloc[:, f_no_index].dropna().values
+                frac_start = fraction["START"]
+                frac_end = fraction["END"]
 
-                    frac_start_index = get_fraction_index(f_no, frac_start)
-                    frac_end_index = get_fraction_index(f_no, frac_end) +1
-                    area_color = fraction.get('COLOR', 'blue')
-                    #ax_left.axvspan(f_ml[frac_start_index], f_ml[frac_end_index], color=area_color, alpha=0.1)
-                    # find UV trace to fill under (use first UV type present)
-                    uv_type = next((t for t in what_to_plot if "UV" in t), None) # Get first UV type
-                    if uv_type is None:
-                        continue
-                    col_uv = get_columns(fn, uv_type)
-                    x_uv = df.iloc[:, col_uv].values
-                    y_uv = df.iloc[:, col_uv + 1].values.astype(float)
-                    # apply same y offset used when plotting UV
-                    # ensure the indices are ordered and within bounds of f_ml
-                    i0, i1 = sorted([frac_start_index, frac_end_index])
-                    i0 = max(0, i0)
-                    i1 = min(i1, len(f_ml) - 1)
+                frac_start_index = get_fraction_index(f_no, frac_start)
+                frac_end_index = get_fraction_index(f_no, frac_end) + 1
+                area_color = fraction.get('COLOR', 'blue')
+                uv_type = next((t for t in what_to_plot if "UV" in t), None)
+                if uv_type is None:
+                    continue
+                col_uv = get_columns(fn, uv_type)
+                x_uv = df.iloc[:, col_uv].values
+                y_uv = df.iloc[:, col_uv + 1].values.astype(float)
+                uv_offset = file_uv_offset if file_uv_offset is not None else global_params['y_offset_UV']
+                y_uv = (y_uv * scaling_factor) + uv_offset
+                i0, i1 = sorted([frac_start_index, frac_end_index])
+                i0 = max(0, i0)
+                i1 = min(i1, len(f_ml) - 1)
 
-                    x0, x1 = f_ml[i0], f_ml[i1]
+                x0, x1 = f_ml[i0], f_ml[i1]
 
-                    # mask the interval on the UV x-axis and fill to baseline=0
-                    m = (x_uv >= x0) & (x_uv <= x1)
-                    if m.any():
-                        baseline = (
-                            global_params['y_min_uv']
-                            if global_params['y_min_uv'] is not None
-                            else y_min_left
-                        )
-                        ax_left.fill_between(
-                            x_uv,
-                            y_uv,
-                            baseline,
-                            where=m,
-                            interpolate=True,
-                            color=area_color,
-                            alpha=0.2,
-                        )
+                m = (x_uv >= x0) & (x_uv <= x1)
+                if m.any():
+                    baseline = (
+                        global_params['y_min_uv']
+                        if global_params['y_min_uv'] is not None
+                        else y_min_current
+                    )
+                    ax_left.fill_between(
+                        x_uv,
+                        y_uv,
+                        baseline,
+                        where=m,
+                        interpolate=True,
+                        color=area_color,
+                        alpha=0.2,
+                    )
 
-        ax_left.set_xlabel('Volume [mL]')
+        current_min, current_max = ax_left.get_ylim()
+        y_min_left = current_min if y_min_left is None else min(y_min_left, current_min)
+        y_max_left = current_max if y_max_left is None else max(y_max_left, current_max)
 
-        # Set y-axis labels
-        if plotted_on_left:
-            ax_left.set_ylabel('Absorption [mAU]')
-        if plotted_on_right:
-            if "Conc B" in what_to_plot:
-                ax_right.set_ylabel('Concentration [%]')
-            elif "Cond" in what_to_plot:
-                ax_right.set_ylabel('Conductivity [mS/cm]')
+    ax_left.set_xlabel('Volume [mL]')
 
-        # Build a combined legend
-        handles_left, labels_left = ax_left.get_legend_handles_labels()
-        handles_right, labels_right = ax_right.get_legend_handles_labels()
-        all_handles = handles_left + handles_right
-        all_labels  = labels_left  + labels_right
+    if plotted_on_left:
+        ax_left.set_ylabel('Absorption [mAU]')
+    if plotted_on_right:
+        if "Conc B" in non_uv_types_seen:
+            ax_right.set_ylabel('Concentration [%]')
+        elif "Cond" in non_uv_types_seen:
+            ax_right.set_ylabel('Conductivity [mS/cm]')
 
-        # Place legend (you can tweak loc as needed)
-        ax_left.legend(all_handles, all_labels, loc='best')
-        if not plotted_on_right:
-            ax_right.set_visible(False)
-        
-        # Set x-axis limits if specified
-        if global_params['x_start'] is not None and global_params['x_end'] is not None:
-            ax_left.set_xlim(global_params['x_start'], global_params['x_end'])
-        elif global_params['x_start'] is not None:
-            ax_left.set_xlim(global_params['x_start'], ax_left.get_xlim()[1])
-        elif global_params['x_end'] is not None:
-            ax_left.set_xlim(ax_left.get_xlim()[0], global_params['x_end'])
+    handles_left, labels_left = ax_left.get_legend_handles_labels()
+    handles_right, labels_right = ax_right.get_legend_handles_labels()
+    all_handles = handles_left + handles_right
+    all_labels = labels_left + labels_right
 
-        if plotted_on_left:
-            y_lower, y_upper = y_min_left, y_max_left
-            if global_params['y_min_uv'] is not None:
-                y_lower = global_params['y_min_uv']
-            if global_params['y_max_uv'] is not None:
-                y_upper = global_params['y_max_uv']
-            ax_left.set_ylim(y_lower, y_upper)
+    ax_left.legend(all_handles, all_labels, loc='best')
+    if not plotted_on_right:
+        ax_right.set_visible(False)
 
-        # Add x minor ticks and ensure left Y ticks are visible
-        ax_left.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(10))
-        ax_left.tick_params(axis='y', which='both', left=True, labelleft=True)
-        plt.tight_layout()
-        #plt.show()
-        plt.savefig(global_params['output_name'], dpi=600)
-    
-    elif len(input_list) > 1:
-        raise ValueError("Multiple files are not supported in this version of the script. Please provide a single file in the input list.")
+    if global_params['x_start'] is not None and global_params['x_end'] is not None:
+        ax_left.set_xlim(global_params['x_start'], global_params['x_end'])
+    elif global_params['x_start'] is not None:
+        ax_left.set_xlim(global_params['x_start'], ax_left.get_xlim()[1])
+    elif global_params['x_end'] is not None:
+        ax_left.set_xlim(ax_left.get_xlim()[0], global_params['x_end'])
+
+    if plotted_on_left:
+        if y_min_left is None or y_max_left is None:
+            y_min_left, y_max_left = ax_left.get_ylim()
+        y_lower, y_upper = y_min_left, y_max_left
+        if global_params['y_min_uv'] is not None:
+            y_lower = global_params['y_min_uv']
+        if global_params['y_max_uv'] is not None:
+            y_upper = global_params['y_max_uv']
+        ax_left.set_ylim(y_lower, y_upper)
+
+    ax_left.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(10))
+    ax_left.tick_params(axis='y', which='both', left=True, labelleft=True)
+    plt.tight_layout()
+    plt.savefig(global_params['output_name'], dpi=600)
 
 
 def make_output_name(output_folder, output_name):
@@ -290,10 +290,6 @@ def main(yaml_config):
     file_entries = cfg.get('FILES', [])
     if not file_entries:
         raise ValueError("Config YAML must contain a 'FILES' list with at least one entry.")
-
-    if len(file_entries) > 1:
-        logging.error("For now, only one file is supported.")
-        sys.exit(1)
 
     # global parameters
     # make default name
@@ -332,7 +328,37 @@ def main(yaml_config):
             sys.exit(1)
         fraction_group = entry.get('FRACTION_GROUPS', None)
 
-        all_plot_data.append((fn, what_to_plot, fraction_group))
+        file_color = entry.get('COLOR')
+        file_uv_offset = (
+            entry.get('UV_OFFSET', entry.get('UV_Offset', entry.get('Y_OFFSET_UV')))
+        )
+        if file_uv_offset is not None:
+            try:
+                file_uv_offset = float(file_uv_offset)
+            except (TypeError, ValueError):
+                logging.error(f"Invalid UV offset '{file_uv_offset}' for file {fn}.")
+                sys.exit(1)
+
+        scaling_factor = entry.get('SCALING_FACTOR', 1)
+        try:
+            scaling_factor = float(scaling_factor)
+        except (TypeError, ValueError):
+            logging.error(f"Invalid SCALING_FACTOR '{scaling_factor}' for file {fn}.")
+            sys.exit(1)
+
+        legend_label = entry.get('LEGEND_LABEL', entry.get('LEGEND'))
+
+        all_plot_data.append(
+            (
+                fn,
+                what_to_plot,
+                fraction_group,
+                file_color,
+                file_uv_offset,
+                scaling_factor,
+                legend_label,
+            )
+        )
 
     plot_run(all_plot_data, global_params)
 
