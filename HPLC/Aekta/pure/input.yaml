@@ -30,6 +30,7 @@ SHOW_FRACTIONS: False # True
 #Y_MIN_UV: None
 #Y_MAX_UV: None
 #Y_OFFSET_UV: 0 # Global default UV offset if a file does not set UV_OFFSET
+#FIG_SIZE: [10, 6] # Width, Height in inches
 
 #USE_SEABORN: True  # Use seaborn style for plots
 #SEABORN_PARAMS:

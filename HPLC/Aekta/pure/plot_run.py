@@ -89,8 +89,8 @@ def plot_run(input_list, global_params):
                         fraction groups, color, uv_offset_override,
                         scaling_factor, legend_label)
     """
-
-    fig, ax_left = plt.subplots(figsize=(10, 6))
+    
+    fig, ax_left = plt.subplots(figsize=global_params['fig_size'])
     ax_right = ax_left.twinx()
 
     plotted_on_left = False
@@ -303,6 +303,7 @@ def main(yaml_config):
         'y_offset_UV': cfg.get('Y_OFFSET_UV', 0),
         'y_min_uv': cfg.get('Y_MIN_UV', None),
         'y_max_uv': cfg.get('Y_MAX_UV', None),
+        'fig_size': tuple(cfg.get('FIG_SIZE', (10, 6))),
     }
     
 
