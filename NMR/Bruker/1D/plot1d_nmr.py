@@ -149,7 +149,7 @@ def main(yaml_config):
     plot_data(all_input_list, output_name, xlimits, ylimits, x_axis_label, scale_range, scale_mode, figure_size)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Plot 1D NMR data from ucsf files.")
+    parser = argparse.ArgumentParser(description="Plot 1D NMR data from bruker files/folder.")
     parser.add_argument(
         "yaml_config",
         nargs="?",
