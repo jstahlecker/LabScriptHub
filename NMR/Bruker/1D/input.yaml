@@ -1,0 +1,36 @@
+FILES:
+  - FILENAME: /path/to/bruker/folder/10 # Or of course any other experiment
+    #COLOR: tab:blue 
+    LABEL: "TestA$_1$" # For special charecters, it is best to use quotes
+    #SCALE_FACTOR: 0.8
+
+  - FILENAME: /path/to/bruker/folder/11
+    #COLOR: "tab:orange"  
+    LABEL: Test2
+    #OFFSET: 2 # Offset in Y direction. May need to be in the ballpark of 1e4
+
+
+# Global settings
+#OUTPUT_FOLDER: "."    # Default output folder
+#OUTPUT_NAME: "test.png"
+#FIG_SIZE: [12, 3]
+
+#X_AXIS_LABEL: '^{1}$H [ppm]' # Use single quotes to avoid YAML parsing issues. 1H is default
+X_LIM:  # If nothing is set, use entire width
+  - 0
+  - 10
+#Y_LIM:  # If nothing is set, use entire data
+  #- -2e4
+  #- 2e5
+
+
+#SCALE_RANGE: #If set, will scale to data to this range
+#  - 0
+#  - 1.2
+#  - "max" # set "min" to scale to minimum
+
+
+#USE_SEABORN: True  # Use seaborn style for plots
+#SEABORN_PARAMS:
+#  style: "ticks"
+#  context: "paper"
