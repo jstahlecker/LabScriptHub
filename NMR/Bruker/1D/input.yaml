@@ -29,6 +29,11 @@ X_LIM:  # If nothing is set, use entire width
 #  - 1.2
 #  - "max" # set "min" to scale to minimum
 
+#LEGEND_PARAMS: # If set, will pass these parameters to plt.legend()
+  #fontsize: 10 #"small" is also an option
+  #handlelength: 1
+  #handletextpad: 0.5
+  #borderpad: 0.5
 
 #USE_SEABORN: True  # Use seaborn style for plots
 #SEABORN_PARAMS:

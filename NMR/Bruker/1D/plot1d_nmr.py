@@ -47,7 +47,7 @@ def get_max_between_ppm(ppm_scale, data, ppm=[2.4, 2.7], mode="max"):
         raise ValueError("mode must be 'max' or 'min'")
 
 
-def plot_data(input_list, output_name, xlimits, ylimits, x_axis_label, scale_range, scale_mode, figure_size):
+def plot_data(input_list, output_name, xlimits, ylimits, x_axis_label, scale_range, scale_mode, figure_size, legend_params=None):
 
     if figure_size is not None:
         plt.figure(figsize=figure_size)
@@ -88,6 +88,10 @@ def plot_data(input_list, output_name, xlimits, ylimits, x_axis_label, scale_ran
     
     plt.yticks([])
     plt.legend()
+    # Make the legend text smaller and more compact
+    if legend_params is not None:
+        print("Applying legend parameters:", legend_params)
+        legend = plt.legend(**legend_params)
     plt.gca().invert_xaxis()
     #plt.show()
     plt.savefig(output_name, dpi=600, bbox_inches='tight')
@@ -122,6 +126,7 @@ def main(yaml_config):
 
     x_axis_label = cfg.get('X_AXIS_LABEL', r"$^{1}$H [ppm]")
     figure_size = cfg.get('FIG_SIZE', None)
+    legend_params = cfg.get('LEGEND_PARAMS', None)
 
     scale_range_raw = cfg.get('SCALE_RANGE', None)
     if scale_range_raw is not None:
@@ -146,7 +151,7 @@ def main(yaml_config):
         all_input_list.append(file_input_list)
 
     # Do Plotting
-    plot_data(all_input_list, output_name, xlimits, ylimits, x_axis_label, scale_range, scale_mode, figure_size)
+    plot_data(all_input_list, output_name, xlimits, ylimits, x_axis_label, scale_range, scale_mode, figure_size, legend_params)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot 1D NMR data from bruker files/folder.")
