@@ -55,9 +55,10 @@ def plot_data(input_list, output_name, xlimits, ylimits, x_axis_label, scale_ran
         plt.figure()
 
     for spectrum_data in input_list:
-        fname, color, label, offset, scale_factor = spectrum_data # unpack the input list 
+        fname, color, label, offset, scale_factor, linewidth = spectrum_data # unpack the input list 
         offset = float(offset)
         scale_factor = float(scale_factor)
+        linewidth = float(linewidth)
 
         # read in the data from the Bruker folder
         dic, data = ng.bruker.read_pdata(fname)
@@ -71,7 +72,7 @@ def plot_data(input_list, output_name, xlimits, ylimits, x_axis_label, scale_ran
             data = data / max_val
         data = data + offset
 
-        plt.plot(ppm_scale, data, color=color, label=label)
+        plt.plot(ppm_scale, data, color=color, label=label, linewidth=linewidth)
 
     plt.xlabel(x_axis_label)
 
@@ -146,8 +147,9 @@ def main(yaml_config):
         label  = entry.get('LABEL', None)
         offset = entry.get('OFFSET', 0)
         scale_factor = entry.get('SCALE_FACTOR', 1.0)
+        linewidth = entry.get('LINEWIDTH', 1.0)
 
-        file_input_list = [fname, color, label, offset, scale_factor]
+        file_input_list = [fname, color, label, offset, scale_factor, linewidth]
         all_input_list.append(file_input_list)
 
     # Do Plotting

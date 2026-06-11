@@ -3,6 +3,7 @@ FILES:
     #COLOR: tab:blue 
     LABEL: "TestA$_1$" # For special charecters, it is best to use quotes
     #SCALE_FACTOR: 0.8
+    #LINEWIDTH: 1
 
   - FILENAME: /path/to/bruker/folder/11
     #COLOR: "tab:orange"  
