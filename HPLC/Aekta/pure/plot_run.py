@@ -237,7 +237,12 @@ def plot_run(input_list, global_params):
     all_handles = handles_left + handles_right
     all_labels = labels_left + labels_right
 
-    ax_left.legend(all_handles, all_labels, loc='best')
+    #ax_left.legend(all_handles, all_labels, loc='best')
+    ax_left.set_zorder(ax_right.get_zorder() + 1)
+    ax_left.patch.set_visible(False)
+
+    leg = ax_left.legend(all_handles, all_labels, loc='best', frameon=True)
+    leg.set_zorder(100)
     if not plotted_on_right:
         ax_right.set_visible(False)
 
