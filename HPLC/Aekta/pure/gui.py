@@ -1,24 +1,4 @@
 #!/usr/bin/env python3
-"""
-gui.py — A PySide6 front-end for plot_run.py (ÄKTA chromatography plotting).
-
-Design philosophy
------------------
-This GUI does NOT re-implement any plotting logic. It imports the core
-functions from ``plot_run.py`` (``plot_run``, ``get_columns``,
-``apply_seaborn_style`` ...) and simply builds the exact ``input_list`` and
-``global_params`` structures that ``plot_run`` expects, then calls it. The
-figure is rendered head-less (Agg backend) to a temporary PNG and shown inline,
-so whatever you change in ``plot_run.py`` is reflected here automatically.
-
-Run with:   python gui.py
-Requires:   PySide6, plus whatever plot_run.py needs (matplotlib, pandas,
-            pyyaml, and optionally seaborn).
-
-Put this file in the same folder as plot_run.py (or anywhere — the script adds
-its own directory to sys.path so the import still works).
-"""
-
 import os
 import re
 import sys
