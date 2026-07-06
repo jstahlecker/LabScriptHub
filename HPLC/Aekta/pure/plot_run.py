@@ -157,7 +157,13 @@ def plot_run(input_list, global_params):
                 logging.warning(f"Could not draw fractions for {fn}: {exc}")
             else:
                 fractions_drawn = True
+                x_start = global_params['x_start']
+                x_end = global_params['x_end']
                 for index, fraction in enumerate(f_ml):
+                    if x_start is not None and fraction < x_start:
+                        continue
+                    if x_end is not None and fraction > x_end:
+                        continue
                     if index == 0 or (index + 1) % 5 == 0:
                         ax_left.axvline(x=fraction, ymin=0, ymax=0.07, color="grey", linewidth=0.6)
                         text = f_no[index]
@@ -186,7 +192,7 @@ def plot_run(input_list, global_params):
 
                 frac_start_index = get_fraction_index(f_no, frac_start)
                 frac_end_index = get_fraction_index(f_no, frac_end) + 1
-                area_color = fraction.get('COLOR', 'blue')
+                area_color = fraction.get('COLOR', 'tab:blue')
                 uv_type = next((t for t in what_to_plot if "UV" in t), None)
                 if uv_type is None:
                     continue

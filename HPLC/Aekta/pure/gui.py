@@ -409,13 +409,14 @@ class FractionGroupRow(QWidget):
         for combo in (self.start, self.end):
             for v in fraction_names:
                 combo.addItem(str(v), v)         # keep native value as data
-        self.color = QLineEdit("blue"); self.color.setMaximumWidth(90)
+        self.color = QLineEdit("tab:blue"); self.color.setMaximumWidth(90)
         rm = QPushButton("✕"); rm.setMaximumWidth(28)
         rm.setToolTip("Remove region")
 
         row.addWidget(QLabel("from")); row.addWidget(self.start, 1)
         row.addWidget(QLabel("to")); row.addWidget(self.end, 1)
         row.addWidget(QLabel("color")); row.addWidget(self.color)
+        row.addStretch(0)
         row.addWidget(rm)
 
         self.start.currentIndexChanged.connect(lambda *_: self.changed.emit())
@@ -436,7 +437,7 @@ class FractionGroupRow(QWidget):
         return {
             "START": self._value(self.start),
             "END": self._value(self.end),
-            "COLOR": self.color.text().strip() or "blue",
+            "COLOR": self.color.text().strip() or "tab:blue",
         }
 
 
@@ -721,7 +722,7 @@ class MainWindow(QMainWindow):
         splitter.addWidget(scroll)
         splitter.setStretchFactor(0, 1)
         splitter.setStretchFactor(1, 0)
-        splitter.setSizes([760, 400])
+        splitter.setSizes([700, 430])
         v.addWidget(splitter, stretch=1)
         return page
 
